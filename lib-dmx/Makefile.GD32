@@ -1,0 +1,7 @@
+DEFINES=OUTPUT_DMX_SEND_MULTI
+DEFINES+=NDEBUG  
+
+EXTRA_INCLUDES=../lib-rdm/include ../lib-properties/include
+
+include Rules.mk
+include ../firmware-template-gd32/lib/Rules.mk
