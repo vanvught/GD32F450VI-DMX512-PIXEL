@@ -23,25 +23,6 @@ ifeq ($(findstring NODE_E131,$(DEFINES)),NODE_E131)
 	endif
 endif
 
-ifeq ($(findstring NODE_SHOWFILE,$(DEFINES)),NODE_SHOWFILE)
-	LIBS+=showfile osc
-	ifneq ($(findstring artnet,$(LIBS)),artnet)
-		LIBS+=artnet
-	endif
-endif
-
-ifeq ($(findstring NODE_LTC_SMPTE,$(DEFINES)),NODE_LTC_SMPTE)
-	LIBS+=ltc tcnet gps midi osc ws28xxdisplay ws28xx device
-endif
-
-ifeq ($(findstring NODE_OSC_CLIENT,$(DEFINES)),NODE_OSC_CLIENT)
-	LIBS+=oscclient osc
-endif
-
-ifeq ($(findstring NODE_OSC_SERVER,$(DEFINES)),NODE_OSC_SERVER)
-	LIBS+=oscserver osc
-endif
-
 ifeq ($(findstring NODE_DDP_DISPLAY,$(DEFINES)),NODE_DDP_DISPLAY)
 	LIBS+=ddp
 endif
@@ -127,28 +108,6 @@ ifeq ($(findstring OUTPUT_DDP_PIXEL,$(DEFINES)),OUTPUT_DDP_PIXEL)
 	LIBS+=ws28xx
 endif
 
-ifeq ($(findstring OUTPUT_DMX_STEPPER,$(DEFINES)),OUTPUT_DMX_STEPPER)
-	LIBS+=l6470dmx l6470
-endif
-
-ifeq ($(findstring OUTPUT_DMX_TLC59711,$(DEFINES)),OUTPUT_DMX_TLC59711)
-	LIBS+=tlc59711dmx tlc59711
-endif
-
-ifeq ($(findstring OUTPUT_DMX_ARTNET,$(DEFINES)),OUTPUT_DMX_ARTNET)
-	LIBS+=artnet
-endif
-
-ifeq ($(findstring OUTPUT_DMX_SERIAL,$(DEFINES)),OUTPUT_DMX_SERIAL)
-	LIBS+=dmxserial
-endif
-
-LIBS+=spiflashstore spiflash
-
-ifeq ($(findstring NODE_LTC_SMPTE,$(DEFINES)),NODE_LTC_SMPTE)
-	DEFINES+=ENABLE_SSD1311 ENABLE_TC1602 ENABLE_CURSOR_MODE
-endif
-
 ifeq ($(findstring NO_EMAC,$(DEFINES)),NO_EMAC)
 else
 	LIBS+=network
@@ -162,6 +121,6 @@ ifneq ($(findstring network,$(LIBS)),network)
 	LIBS+=network
 endif
 
-LIBS+=properties lightset display hal
+LIBS+=configstore flash properties lightset display hal
 
 $(info $$LIBS [${LIBS}])

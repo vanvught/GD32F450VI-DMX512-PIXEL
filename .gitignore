@@ -48,3 +48,8 @@
 # Build
 */build_gd32/*
 */lib_gd32/*
+*.su
+*.list
+
+*.bin
+udp_send
