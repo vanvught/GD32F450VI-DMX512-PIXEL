@@ -7,6 +7,7 @@ LD	= $(PREFIX)ld
 AR	= $(PREFIX)ar
 
 BOARD?=BOARD_GD32F450V
+ENET_PHY?=DP83848
 MCU?=gd32f450
 FAMILY?=gd32f4xx
 
@@ -26,7 +27,7 @@ DEFINES:=$(addprefix -D,$(DEFINES))
 DEFINES+=-D_TIME_STAMP_YEAR_=$(shell date  +"%Y") -D_TIME_STAMP_MONTH_=$(shell date  +"%-m") -D_TIME_STAMP_DAY_=$(shell date  +"%-d")
 DEFINES+=-DCONFIG_STORE_USE_I2C
 
-COPS=-DBARE_METAL -DGD32 -DGD32F450 -D$(BOARD)
+COPS=-DBARE_METAL -DGD32 -DGD32F450 -D$(BOARD) -DPHY_TYPE=$(ENET_PHY)
 COPS+=$(DEFINES) $(MAKE_FLAGS) $(INCLUDES)
 COPS+=-Os -mcpu=cortex-m4 -mthumb -g -mfloat-abi=hard -fsingle-precision-constant -mfpu=fpv4-sp-d16
 COPS+=-DARM_MATH_CM4 -D__FPU_PRESENT=1
