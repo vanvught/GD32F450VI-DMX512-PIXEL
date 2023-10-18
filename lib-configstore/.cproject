@@ -28,7 +28,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib-artnet/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib-configstore/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib-e131/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib-artnet4/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib-remoteconfig/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib-displayudf/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib-debug/include}&quot;"/>
@@ -72,8 +71,9 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="scr/e131|examples|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry excluding="oscclient|rdm|widget|device|ddp|pixel|e131|artnet|stepper|ltc|node" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="dmx|oscclient|rdm|widget|device|ddp|pixel|e131|artnet|stepper|ltc|node" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/artnet"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/dmx"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/e131"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/pixel"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/rdm"/>
@@ -180,8 +180,9 @@
 						<entry excluding="device|device/file|device/i2c|device/ram/gd32|device/rom|device/spi|src|src/gd32" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry excluding="file|i2c|ram/gd32|rom|spi" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="device"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="device/i2c"/>
-						<entry excluding="artnet|e131|ltc|node|oscclient|pixel|rdm|stepper|widget" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="dmx|artnet|e131|ltc|node|oscclient|pixel|rdm|stepper|widget" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/artnet"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src/dmx"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/e131"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/pixel"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/rdm"/>

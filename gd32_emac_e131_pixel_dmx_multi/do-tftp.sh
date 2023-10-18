@@ -8,8 +8,16 @@ exit
 fi
 
 echo '!tftp#1' | udp_send $1 
-sleep 1
-echo '?tftp#' | udp_send $1 
+ON_LINE=$(echo '?tftp#' | udp_send $1 ) || true
+echo [$ON_LINE]
+
+while  [ "$ON_LINE" == "tftp:Off" ]
+ do
+    sleep 1
+    echo '!tftp#1' | udp_send $1 
+    ON_LINE=$(echo '?tftp#' | udp_send $1 )  || true
+done
+
 sleep 1
 echo -e "Rebooting..."
 echo '?reboot##' | udp_send $1 
@@ -33,7 +41,7 @@ quit
 echo '!tftp#0' | udp_send $1 
 sleep 1
 echo '?tftp#' | udp_send $1 
-sleep 1
+sleep 2
 echo -e "Rebooting..."
 echo '?reboot##' | udp_send $1 
 

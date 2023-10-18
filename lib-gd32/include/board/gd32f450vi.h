@@ -2,7 +2,7 @@
  * @file gd32f450vi.h
  *
  */
-/* Copyright (C) 2022 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2022-2023 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,22 +55,6 @@
 #define LED_BLINK_GPIO_CLK	LED1_RCU_GPIOx
 
 /**
- * LEDs bit-banging 595	--> Using SPI2 pin's: MOSI, SCK and NSS
- */
-
-#define LED595_DATA_GPIO_PINx	GPIO_PIN_5
-#define LED595_DATA_RCU_GPIOx	RCU_GPIOB
-#define LED595_DATA_GPIOx		GPIOB
-
-#define LED595_CLK_GPIO_PINx	GPIO_PIN_3
-#define LED595_CLK_RCU_GPIOx	RCU_GPIOB
-#define LED595_CLK_GPIOx		GPIOB
-
-#define LED595_LOAD_GPIO_PINx	GPIO_PIN_15
-#define LED595_LOAD_RCU_GPIOx	RCU_GPIOA
-#define LED595_LOAD_GPIOx		GPIOA
-
-/**
  * KEYs
  */
 
@@ -82,13 +66,9 @@
 #define KEY2_GPIOx						GPIOC
 #define KEY2_RCU_GPIOx					RCU_GPIOC
 
-#define KEY3_PINx						GPIO_PIN_13
-#define KEY3_GPIOx						GPIOC
-#define KEY3_RCU_GPIOx					RCU_GPIOC
-
-#define KEY_BOOTLOADER_TFTP_GPIO_PINx	KEY3_PINx
-#define KEY_BOOTLOADER_TFTP_GPIOx		KEY3_GPIOx
-#define KEY_BOOTLOADER_TFTP_RCU_GPIOx	KEY3_RCU_GPIOx
+#define KEY_BOOTLOADER_TFTP_GPIO_PINx	KEY2_PINx
+#define KEY_BOOTLOADER_TFTP_GPIOx		KEY2_GPIOx
+#define KEY_BOOTLOADER_TFTP_RCU_GPIOx	KEY2_RCU_GPIOx
 
 /**
  * I2C
@@ -111,7 +91,6 @@
  * SPI
  */
 
-// #define SPI2_REMAP
 #if defined (SPI2_REMAP)
 # define SPI_REMAP			SPI2_REMAP_GPIO
 #endif
@@ -134,9 +113,7 @@
  */
 
 #define USART0_REMAP
-// #define USART1_REMAP
 #define USART2_FULL_REMAP
-// #define UART3_REMAP
 
 /**
  * Panel LEDs
@@ -158,8 +135,6 @@ static constexpr uint32_t TCNET = 0;
 // DMX
 static constexpr uint32_t PORT_A_RX = 0;
 static constexpr uint32_t PORT_A_TX = 0;
-//
-static constexpr uint32_t INVERTED = 0;
 }  // namespace panelled
 }  // namespace hal
 #endif

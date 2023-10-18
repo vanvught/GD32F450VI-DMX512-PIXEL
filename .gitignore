@@ -53,3 +53,5 @@
 
 *.bin
 udp_send
+*.map
+*.size

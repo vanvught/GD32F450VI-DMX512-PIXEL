@@ -2,7 +2,9 @@ MEMORY
 {
   FLASH (rx)      : ORIGIN = 0x08008000, LENGTH = 256K - 0x8000
   TCMSRAM (rw)    : ORIGIN = 0x10000000, LENGTH = 64K
-  RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 192K
+  RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 112K
+  RAM1 (xrw)      : ORIGIN = 0x2001C000, LENGTH = 16K
+  RAM2 (xrw)      : ORIGIN = 0x20020000, LENGTH = 64K
   RAMADD (xrw)    : ORIGIN = 0x20030000, LENGTH = 256K
   BKPSRAM (rw)	  : ORIGIN = 0x40024000, LENGTH = 4K
 }
@@ -11,7 +13,7 @@ ENTRY(Reset_Handler)
 
 SECTIONS
 {
-  __heap_size = DEFINED(__heap_size) ? __heap_size : 8K;
+  __heap_size = DEFINED(__heap_size) ? __heap_size : 4K;
   __stack_size = DEFINED(__stack_size) ? __stack_size : 16K;
 
   .vectors :
@@ -26,19 +28,34 @@ SECTIONS
   .text :
   {
     . = ALIGN(4);
-    *(.text.unlikely*)
-    *(.text.hot*)
+	*(.text.unlikely*)
+	*(.text.hot*)
 	*(.text)
 	*(.text*)
 	*(.glue_7)
 	*(.glue_7t)
 	*(.eh_frame)
-
     KEEP (*(.init))
     KEEP (*(.fini))
-
     . = ALIGN(4);
     _etext = .;
+    
+    . = ALIGN(8);
+     
+    PROVIDE_HIDDEN (__preinit_array_start = .);
+    KEEP (*(.preinit_array*))
+    PROVIDE_HIDDEN (__preinit_array_end = .);
+
+    PROVIDE_HIDDEN (__init_array_start = .);
+    KEEP (*(SORT(.init_array.*)))
+    KEEP (*(.init_array*))
+    PROVIDE_HIDDEN (__init_array_end = .);
+
+    PROVIDE_HIDDEN (__fini_array_start = .);
+    KEEP (*(.fini_array*))
+    KEEP (*(SORT(.fini_array.*)))
+    PROVIDE_HIDDEN (__fini_array_end = .);
+    
   } >FLASH
 
   .rodata :
@@ -48,42 +65,69 @@ SECTIONS
     *(.rodata*)
     . = ALIGN(4);
   } >FLASH
-
-   .ARM.extab :
-  { 
-     *(.ARM.extab* .gnu.linkonce.armextab.*) 
-  } >FLASH
   
-    .ARM : {
-    __exidx_start = .;
-    *(.ARM.exidx*)
-    __exidx_end = .;
-    } >FLASH
-
-  .ARM.attributes : { *(.ARM.attributes) } > FLASH
-
-  .preinit_array :
+  .stack :
   {
-    PROVIDE_HIDDEN (__preinit_array_start = .);
-    KEEP (*(.preinit_array*))
-    PROVIDE_HIDDEN (__preinit_array_end = .);
-  } >FLASH
+	. = ALIGN(4);
+	PROVIDE( stack_low = . );
+    . = . + __stack_size;  
+    PROVIDE( _sp = . ); 
+    . = ALIGN(4);
+  } >TCMSRAM
 
-  .init_array :
+  .tcmsram :
   {
-    PROVIDE_HIDDEN (__init_array_start = .);
-    KEEP (*(SORT(.init_array.*)))
-    KEEP (*(.init_array*))
-    PROVIDE_HIDDEN (__init_array_end = .);
-  } >FLASH
+  	. = ALIGN(4);
+    *(.tcmsram)
+    *(.tcmsram*)
+    . = ALIGN(4);
+    _snetwork = .;
+    *(.network*)
+    . = ALIGN(4);
+    _enetwork = .;
+  } >TCMSRAM
+  
+  .heap :
+  {
+    . = ALIGN(4);
+    heap_low = .;
+    . = . + __heap_size;
+    heap_top = .;
+    . = ALIGN(4);
+  } >TCMSRAM
+  
+  .ram :
+  {
+  	. = ALIGN(4);
+  	_slightset = .;
+    *(.lightset*)
+    . = ALIGN(4);
+    _elightset = .;
+  } >RAM
 
-  .fini_array :
+  .sram1 :
   {
-    PROVIDE_HIDDEN (__fini_array_start = .);
-    KEEP (*(.fini_array*))
-    KEEP (*(SORT(.fini_array.*)))
-    PROVIDE_HIDDEN (__fini_array_end = .);
-  } >FLASH
+  	. = ALIGN(4);
+    *(.sram1)
+    *(.sram1*)
+	. = ALIGN(4);
+    _sdmx = .;
+    *(.dmx)
+	. = ALIGN(4);
+    _edmx = .;
+  } >RAM1 
+  
+  .sram2 :
+  {
+  	. = ALIGN(4);
+    *(.sram2)
+    *(.sram2*)
+	. = ALIGN(4);
+	_spixel = .;
+    *(.pixel)
+	. = ALIGN(4);
+	_epixel = .;
+  } >RAM2 
 
   _sidata = LOADADDR(.data);
   .data :
@@ -94,7 +138,7 @@ SECTIONS
     *(.data*)
     . = ALIGN(4);
     _edata = .;
-  } >RAM AT> FLASH
+  } >RAMADD AT> FLASH
 
   . = ALIGN(4);
   .bss :
@@ -107,39 +151,11 @@ SECTIONS
     . = ALIGN(4);
     _ebss = .;
     __bss_end__ = _ebss;
-  } >RAM
+  } >RAMADD
 
- . = ALIGN(8);
+  . = ALIGN(8);
   PROVIDE ( end = _ebss );
   PROVIDE ( _end = _ebss );
-
-  .tcmsram :
-  {
-  	_stcmsram = .;
-  	. = ALIGN(4);
-    *(.tcmsram)
-    *(.tcmsram*)
-    *(.network*)
-    . = ALIGN(4);
-     _etcmsram = .;
-  } >TCMSRAM AT>TCMSRAM
-  
-  .heap ORIGIN(TCMSRAM) + LENGTH(TCMSRAM) - __heap_size  - __stack_size :
-  {
-    . = ALIGN(4);
-    heap_low = .;
-    . = . + __heap_size;
-    heap_top = .;
-    . = ALIGN(4);
-  } >TCMSRAM AT>TCMSRAM
-  
-  .stack ORIGIN(TCMSRAM) + LENGTH(TCMSRAM) - __stack_size :
-  {
-	. = ALIGN(4);
-    . = __stack_size;  
-    PROVIDE( _sp = . ); 
-    . = ALIGN(4);
-  } >TCMSRAM AT>TCMSRAM
   
   .ramadd :
   {
@@ -147,10 +163,9 @@ SECTIONS
   	. = ALIGN(4);
     *(.ramadd)
     *(.ramadd*)
-    *(.lightset*)
     . = ALIGN(4);
     _eramadd = .;
-  } >RAMADD AT>RAMADD
+  } >RAMADD
 
   .bkpsram :
   {
@@ -158,11 +173,11 @@ SECTIONS
     *(.bkpsram)
     *(.bkpsram*)
     *(.configstore*)
-  } >BKPSRAM AT>BKPSRAM
+  } >BKPSRAM
 
   /DISCARD/ :
   {
-	*(*.ARM.attributes)
+	*(*.ARM.*)
 	*(*.comment)
 	*(*.debug*)
   }

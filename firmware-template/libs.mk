@@ -10,11 +10,7 @@ ifeq ($(findstring NODE_NODE,$(DEFINES)),NODE_NODE)
 endif	
 
 ifeq ($(findstring NODE_ARTNET,$(DEFINES)),NODE_ARTNET)
-	LIBS+=artnet4 artnet e131
-	ifeq ($(findstring ARTNET_VERSION=3,$(DEFINES)),ARTNET_VERSION=3)
-	else
-		DEFINES+=NODE_E131
-	endif
+	LIBS+=artnet e131
 endif
 
 ifeq ($(findstring NODE_E131,$(DEFINES)),NODE_E131)
