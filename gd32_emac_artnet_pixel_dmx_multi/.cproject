@@ -128,7 +128,6 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="cdt.managedbuild.toolchain.gnu.cross.base.308843693.732003918.2134883042.generate_sofware_version_id.sh" name="generate_sofware_version_id.sh" rcbsApplicability="disable" resourcePath="generate_sofware_version_id.sh" toolsToInvoke=""/>
 					<sourceEntries>
 						<entry excluding="lcd|lib|firmware" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="firmware"/>

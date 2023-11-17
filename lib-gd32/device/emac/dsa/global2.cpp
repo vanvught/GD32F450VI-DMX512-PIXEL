@@ -77,7 +77,7 @@ static int mv88e6xxx_g2_smi_phy_cmd(const uint16_t nCommand) {
 	return nResult;
 }
 
-static int mv88e6xxx_g2_smi_phy_access(const bool c45, const uint16_t op, uint32_t dev, const uint32_t reg) {
+static int mv88e6xxx_g2_smi_phy_access(const bool c45, const uint32_t op, uint32_t dev, const uint32_t reg) {
 	DEBUG_ENTRY
 	DEBUG_PRINTF("op=0x%.4x", op);
 
@@ -95,12 +95,12 @@ static int mv88e6xxx_g2_smi_phy_access(const bool c45, const uint16_t op, uint32
 	cmd |= dev & MV88E6XXX_G2_SMI_PHY_CMD_DEV_ADDR_MASK;
 	cmd |= reg & MV88E6XXX_G2_SMI_PHY_CMD_REG_ADDR_MASK;
 
-	const auto nResult = mv88e6xxx_g2_smi_phy_cmd(cmd);
+	const auto nResult = mv88e6xxx_g2_smi_phy_cmd(static_cast<uint16_t>(cmd));
 	DEBUG_EXIT
 	return nResult;
 }
 
-static int mv88e6xxx_g2_smi_phy_access_c22(uint16_t op, uint32_t dev, uint32_t reg) {
+static int mv88e6xxx_g2_smi_phy_access_c22(uint32_t op, uint32_t dev, uint32_t reg) {
 	return mv88e6xxx_g2_smi_phy_access(false, op, dev, reg);
 }
 
@@ -119,7 +119,7 @@ bool mv88e6xxx_g2_smi_phy_read_data_c22(const uint32_t nAddress, const uint32_t 
 		return err;
 	}
 
-	const uint16_t op = MV88E6XXX_G2_SMI_PHY_CMD_OP_22_READ_DATA;
+	const uint32_t op = MV88E6XXX_G2_SMI_PHY_CMD_OP_22_READ_DATA;
 
 	err = mv88e6xxx_g2_smi_phy_access_c22(op, nAddress, nRegister);
 
