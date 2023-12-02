@@ -1,8 +1,8 @@
 /**
- * @file rdmsensorina219power.h
+ * @file cputemperature.h
  *
  */
-/* Copyright (C) 2020 by Arjan van Vught mailto:info@orangepi-dmx.nl
+/* Copyright (C) 2018-2023 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,36 +23,46 @@
  * THE SOFTWARE.
  */
 
-#ifndef RDMSENSORINA219POWER_H_
-#define RDMSENSORINA219POWER_H_
+#ifndef CPUTEMPERATURE_H_
+#define CPUTEMPERATURE_H_
 
 #include <cstdint>
 
 #include "rdmsensor.h"
-#include "ina219.h"
-
 #include "rdm_e120.h"
+#include "hardware.h"
 
-class RDMSensorINA219Power: public RDMSensor, sensor::INA219 {
+#include "debug.h"
+
+class CpuTemperature final: public RDMSensor {
 public:
-	RDMSensorINA219Power(uint8_t nSensor, uint8_t nAddress = 0) : RDMSensor(nSensor), sensor::INA219(nAddress) {
-		SetType(E120_SENS_CURRENT);
-		SetUnit(E120_UNITS_AMPERE_DC);
-		SetPrefix(E120_PREFIX_MILLI);
-		SetRangeMin(rdm::sensor::safe_range_min(sensor::ina219::power::RANGE_MIN));
-		SetRangeMax(rdm::sensor::safe_range_max(sensor::ina219::power::RANGE_MAX));
-		SetNormalMin(rdm::sensor::safe_range_min(sensor::ina219::power::RANGE_MIN));
-		SetNormalMax(rdm::sensor::safe_range_max(sensor::ina219::power::RANGE_MAX));
-		SetDescription(sensor::ina219::power::DESCRIPTION);
+	CpuTemperature(uint8_t nSensor): RDMSensor(nSensor) {
+		SetType(E120_SENS_TEMPERATURE);
+		SetUnit(E120_UNITS_CENTIGRADE);
+		SetPrefix(E120_PREFIX_NONE);
+		SetRangeMin(static_cast<int16_t>(Hardware::Get()->GetCoreTemperatureMin()));
+		SetRangeMax(static_cast<int16_t>(Hardware::Get()->GetCoreTemperatureMax()));
+		SetNormalMin(static_cast<int16_t>(Hardware::Get()->GetCoreTemperatureMin()));
+		SetNormalMax(static_cast<int16_t>(Hardware::Get()->GetCoreTemperatureMax()));
+		SetDescription("CPU");
 	}
 
 	bool Initialize() override {
-		return sensor::INA219::Initialize();
+		DEBUG_ENTRY
+	#if defined (__APPLE__)
+		DEBUG_EXIT
+		return false;
+	#else
+		DEBUG_EXIT
+		return true;
+	#endif
 	}
 
 	int16_t GetValue() override {
-		return static_cast<int16_t>(sensor::INA219::GetBusPower());
+		const auto nValue = static_cast<int16_t>(Hardware::Get()->GetCoreTemperature());
+		DEBUG_PRINTF("nValue=%d", nValue);
+		return nValue;
 	}
 };
 
-#endif /* RDMSENSORINA219POWER_H_ */
+#endif /* CPUTEMPERATURE_H_ */
