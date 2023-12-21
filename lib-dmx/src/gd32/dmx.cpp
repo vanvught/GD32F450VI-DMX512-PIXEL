@@ -1309,17 +1309,20 @@ void TIMER3_IRQHandler() {
 }
 
 void TIMER6_IRQHandler() {
-	for (auto i = 0; i < DMX_MAX_PORTS; i++) {
-		sv_nRxDmxPackets[i].nPerSecond = sv_nRxDmxPackets[i].nCount - sv_nRxDmxPackets[i].nCountPrevious;
-		sv_nRxDmxPackets[i].nCountPrevious = sv_nRxDmxPackets[i].nCount;
+	const auto nIntFlag = TIMER_INTF(TIMER6);
+
+	if ((nIntFlag & TIMER_INT_FLAG_UP) == TIMER_INT_FLAG_UP) {
+		for (auto i = 0; i < DMX_MAX_PORTS; i++) {
+			sv_nRxDmxPackets[i].nPerSecond = sv_nRxDmxPackets[i].nCount - sv_nRxDmxPackets[i].nCountPrevious;
+			sv_nRxDmxPackets[i].nCountPrevious = sv_nRxDmxPackets[i].nCount;
+		}
+
 	}
 
-	timer_interrupt_flag_clear(TIMER6, TIMER_INT_FLAG_UP);
+	timer_interrupt_flag_clear(TIMER6, nIntFlag);
 }
 #endif
 }
-
-#include <stdio.h>
 
 extern "C" {
 /*
@@ -2197,7 +2200,7 @@ uint32_t Dmx::GetDmxUpdatesPerSecond(UNUSED uint32_t nPortIndex) {
 #endif
 }
 
-uint32_t GetDmxReceivedCount(UNUSED uint32_t nPortIndex) {
+uint32_t Dmx::GetDmxReceivedCount(UNUSED uint32_t nPortIndex) {
 	assert(nPortIndex < DMX_MAX_PORTS);
 #if !defined(CONFIG_DMX_TRANSMIT_ONLY)
 	return sv_nRxDmxPackets[nPortIndex].nCount;
@@ -2333,6 +2336,34 @@ void Dmx::RdmSendRaw(const uint32_t nPortIndex, const uint8_t* pRdmData, uint32_
 	while (SET != usart_flag_get(nUart, USART_FLAG_TC)) {
 		static_cast<void>(GET_BITS(USART_DATA(nUart), 0U, 8U));
 	}
+}
+
+void Dmx::RdmSendDiscoveryRespondMessage(uint32_t nPortIndex, const uint8_t *pRdmData, uint32_t nLength) {
+	DEBUG_PRINTF("nPort=%u, pRdmData=%p, nLength=%u", nPortIndex, pRdmData, nLength);
+	assert(nPortIndex < DMX_MAX_PORTS);
+	assert(pRdmData != nullptr);
+	assert(nLength != 0);
+
+	// 3.2.2 Responder Packet spacing
+	udelay(RDM_RESPONDER_PACKET_SPACING, gv_RdmDataReceiveEnd);
+
+	SetPortDirection(nPortIndex, dmx::PortDirection::OUTP, false);
+
+	const auto nUart = _port_to_uart(nPortIndex);
+
+	for (uint32_t i = 0; i < nLength; i++) {
+		while (RESET == usart_flag_get(nUart, USART_FLAG_TBE))
+			;
+		USART_DATA(nUart) = static_cast<uint16_t>(USART_DATA_DATA & pRdmData[i]);
+	}
+
+	while (SET != usart_flag_get(nUart, USART_FLAG_TC)) {
+		static_cast<void>(GET_BITS(USART_DATA(nUart), 0U, 8U));
+	}
+
+	udelay(RDM_RESPONDER_DATA_DIRECTION_DELAY);
+
+	SetPortDirection(nPortIndex, dmx::PortDirection::INP, true);
 }
 
 // RDM Receive

@@ -96,11 +96,7 @@ void main() {
 	display.TextStatus(NetworkConst::MSG_MDNS_CONFIG, Display7SegmentMessage::INFO_MDNS_CONFIG, CONSOLE_YELLOW);
 
 	MDNS mDns;
-	mDns.AddServiceRecord(nullptr, mdns::Services::CONFIG, "node=DDP Pixel");
-	mDns.AddServiceRecord(nullptr, mdns::Services::DDP, "type=display");
-#if defined (ENABLE_HTTPD)
-	mDns.AddServiceRecord(nullptr, mdns::Services::HTTP);
-#endif
+	mDns.ServiceRecordAdd(nullptr, mdns::Services::DDP, "type=display");
 	mDns.Print();
 
 #if defined (ENABLE_HTTPD)
@@ -149,15 +145,12 @@ void main() {
 	llrpOnlyDevice.SetProductDetail(E120_PRODUCT_DETAIL_LED);
 	llrpOnlyDevice.Init();
 
-	StoreRDMDevice storeRdmDevice;
-	RDMDeviceParams rdmDeviceParams(&storeRdmDevice);
+	RDMDeviceParams rdmDeviceParams;
 
-	if (rdmDeviceParams.Load()) {
-		rdmDeviceParams.Dump();
-		rdmDeviceParams.Set(&llrpOnlyDevice);
-	}
+	rdmDeviceParams.Load();
+	rdmDeviceParams.Dump();
+	rdmDeviceParams.Set(&llrpOnlyDevice);
 
-	llrpOnlyDevice.SetRDMDeviceStore(&storeRdmDevice);
 	llrpOnlyDevice.Print();
 #endif
 

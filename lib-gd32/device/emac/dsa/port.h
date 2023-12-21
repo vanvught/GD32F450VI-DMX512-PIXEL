@@ -75,6 +75,10 @@
 #define MV88E6XXX_PORT_SWITCH_ID_PROD_6161	0x1610
 #define MV88E6XXX_PORT_SWITCH_ID_REV_MASK	0x000f
 
+/* Offset 0x06: Port Based VLAN Map */
+#define MV88E6XXX_PORT_BASE_VLAN				0x06
+#define MV88E6XXX_PORT_BASE_VLAN_TABLE_MASK		0x03ff
+
 int mv88e6xxx_port_read(const uint32_t nPortNumber, const uint32_t nRegister, uint16_t& nValue);
 
 #endif /* PORT_H_ */

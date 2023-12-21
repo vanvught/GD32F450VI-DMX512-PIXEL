@@ -100,6 +100,7 @@ void main() {
 	display.TextStatus(NetworkConst::MSG_NETWORK_INIT, Display7SegmentMessage::INFO_NETWORK_INIT, CONSOLE_YELLOW);
 	StoreNetwork storeNetwork;
 	Network nw(&storeNetwork);
+	MDNS mDns;
 	display.TextStatus(NetworkConst::MSG_NETWORK_STARTED, Display7SegmentMessage::INFO_NONE, CONSOLE_GREEN);
 	FirmwareVersion fw(SOFTWARE_VERSION, __DATE__, __TIME__);
 
@@ -107,13 +108,6 @@ void main() {
 	nw.Print();
 
 	display.TextStatus(NetworkConst::MSG_MDNS_CONFIG, Display7SegmentMessage::INFO_MDNS_CONFIG, CONSOLE_YELLOW);
-
-	MDNS mDns;
-	mDns.AddServiceRecord(nullptr, mdns::Services::CONFIG, "node=Art-Net Pixel DMX");
-#if defined (ENABLE_HTTPD)
-	mDns.AddServiceRecord(nullptr, mdns::Services::HTTP);
-#endif
-	mDns.Print();
 
 #if defined (ENABLE_HTTPD)
 	HttpDaemon httpDaemon;
@@ -239,15 +233,12 @@ void main() {
 
 	llrpOnlyDevice.Init();
 
-	StoreRDMDevice storeRdmDevice;
-	RDMDeviceParams rdmDeviceParams(&storeRdmDevice);
+	RDMDeviceParams rdmDeviceParams;
 
-	if (rdmDeviceParams.Load()) {
-		rdmDeviceParams.Dump();
-		rdmDeviceParams.Set(&llrpOnlyDevice);
-	}
+	rdmDeviceParams.Load();
+	rdmDeviceParams.Dump();
+	rdmDeviceParams.Set(&llrpOnlyDevice);
 
-	llrpOnlyDevice.SetRDMDeviceStore(&storeRdmDevice);
 	llrpOnlyDevice.Print();
 #endif
 
@@ -289,6 +280,8 @@ void main() {
 
 	while (configStore.Flash())
 		;
+
+	mDns.Print();
 
 	display.TextStatus(ArtNetMsgConst::START, Display7SegmentMessage::INFO_NODE_START, CONSOLE_YELLOW);
 

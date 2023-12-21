@@ -33,7 +33,7 @@
 # include <cstdio>
 #endif
 
-#include "rdm.h"
+#include "rdmconst.h"
 
 #include "debug.h"
 
@@ -61,7 +61,7 @@ public:
 		}
 	}
 
-	~RDMTod() {}
+	~RDMTod() = default;
 
 	void Reset() {
 		for (uint32_t i = 0; i < m_nEntries; i++) {

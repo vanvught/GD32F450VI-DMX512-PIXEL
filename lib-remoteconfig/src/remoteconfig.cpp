@@ -40,6 +40,9 @@
 
 #include "hardware.h"
 #include "network.h"
+#if !defined (CONFIG_REMOTECONFIG_MINIMUM)
+# include "mdns.h"
+#endif
 #include "display.h"
 
 #include "properties.h"
@@ -287,11 +290,24 @@ RemoteConfig::RemoteConfig(remoteconfig::Node node, remoteconfig::Output output,
 	m_nHandle = Network::Get()->Begin(remoteconfig::udp::PORT);
 	assert(m_nHandle != -1);
 
+#if !defined (CONFIG_REMOTECONFIG_MINIMUM)
+	assert(MDNS::Get() != nullptr);
+	MDNS::Get()->ServiceRecordAdd(nullptr, mdns::Services::CONFIG);
+
+# if defined(ENABLE_TFTP_SERVER)
+	MDNS::Get()->ServiceRecordAdd(nullptr, mdns::Services::TFTP);
+# endif
+#endif
+
 	DEBUG_EXIT
 }
 
 RemoteConfig::~RemoteConfig() {
 	DEBUG_ENTRY
+
+#if !defined (CONFIG_REMOTECONFIG_MINIMUM)
+	MDNS::Get()->ServiceRecordDelete(mdns::Services::CONFIG);
+#endif
 
 	Network::Get()->End(remoteconfig::udp::PORT);
 	m_nHandle = -1;
@@ -313,10 +329,16 @@ void RemoteConfig::SetDisable(bool bDisable) {
 	if (bDisable && !m_bDisable) {
 		Network::Get()->End(remoteconfig::udp::PORT);
 		m_nHandle = -1;
+#if !defined (CONFIG_REMOTECONFIG_MINIMUM)
+		MDNS::Get()->ServiceRecordDelete(mdns::Services::CONFIG);
+#endif
 		m_bDisable = true;
 	} else if (!bDisable && m_bDisable) {
 		m_nHandle = Network::Get()->Begin(remoteconfig::udp::PORT);
 		assert(m_nHandle != -1);
+#if !defined (CONFIG_REMOTECONFIG_MINIMUM)
+		MDNS::Get()->ServiceRecordAdd(nullptr, mdns::Services::CONFIG);
+#endif
 		m_bDisable = false;
 	}
 
@@ -650,7 +672,7 @@ void RemoteConfig::HandleGetOscClntTxt(uint32_t& nSize) {
 void RemoteConfig::HandleGetRdmDeviceTxt(uint32_t& nSize) {
 	DEBUG_ENTRY
 
-	RDMDeviceParams rdmDeviceParams(StoreRDMDevice::Get());
+	RDMDeviceParams rdmDeviceParams;
 	rdmDeviceParams.Save(s_pUdpBuffer, remoteconfig::udp::BUFFER_SIZE, nSize);
 
 	DEBUG_EXIT
@@ -659,7 +681,7 @@ void RemoteConfig::HandleGetRdmDeviceTxt(uint32_t& nSize) {
 void RemoteConfig::HandleGetRdmSensorsTxt(uint32_t& nSize) {
 	DEBUG_ENTRY
 
-	RDMSensorsParams rdmSensorsParams(StoreRDMSensors::Get());
+	RDMSensorsParams rdmSensorsParams;
 	rdmSensorsParams.Save(s_pUdpBuffer, remoteconfig::udp::BUFFER_SIZE, nSize);
 
 	DEBUG_EXIT
@@ -669,7 +691,7 @@ void RemoteConfig::HandleGetRdmSensorsTxt(uint32_t& nSize) {
 void RemoteConfig::HandleGetRdmSubdevTxt(uint32_t& nSize) {
 	DEBUG_ENTRY
 
-	RDMSubDevicesParams rdmSubDevicesParams(StoreRDMSubDevices::Get());
+	RDMSubDevicesParams rdmSubDevicesParams;
 	rdmSubDevicesParams.Save(s_pUdpBuffer, remoteconfig::udp::BUFFER_SIZE, nSize);
 
 	DEBUG_EXIT
@@ -1272,9 +1294,7 @@ void RemoteConfig::HandleSetNodeTxt(const node::Personality personality) {
 void RemoteConfig::HandleSetRdmDeviceTxt() {
 	DEBUG_ENTRY
 
-	assert(StoreRDMDevice::Get() != nullptr);
-	RDMDeviceParams rdmDeviceParams(StoreRDMDevice::Get());
-
+	RDMDeviceParams rdmDeviceParams;
 	rdmDeviceParams.Load(s_pUdpBuffer, m_nBytesReceived);
 #ifndef NDEBUG
 	rdmDeviceParams.Dump();
@@ -1286,9 +1306,7 @@ void RemoteConfig::HandleSetRdmDeviceTxt() {
 void RemoteConfig::HandleSetRdmSensorsTxt() {
 	DEBUG_ENTRY
 
-	assert(StoreRDMSensors::Get() != nullptr);
-	RDMSensorsParams rdmSensorsParams(StoreRDMSensors::Get());
-
+	RDMSensorsParams rdmSensorsParams;
 	rdmSensorsParams.Load(s_pUdpBuffer, m_nBytesReceived);
 #ifndef NDEBUG
 	rdmSensorsParams.Dump();
@@ -1301,8 +1319,7 @@ void RemoteConfig::HandleSetRdmSensorsTxt() {
 void RemoteConfig::HandleSetRdmSubdevTxt() {
 	DEBUG_ENTRY
 
-	assert(StoreRDMSubDevices::Get() != nullptr);
-	RDMSubDevicesParams rdmSubDevicesParams(StoreRDMSubDevices::Get());
+	RDMSubDevicesParams rdmSubDevicesParams;
 
 	rdmSubDevicesParams.Load(s_pUdpBuffer, m_nBytesReceived);
 #ifndef NDEBUG

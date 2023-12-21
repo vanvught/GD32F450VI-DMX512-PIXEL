@@ -1,4 +1,5 @@
-DEFINES=DISABLE_FS NDEBUG
+DEFINES =DISABLE_FS 
+DEFINES+=NDEBUG
 
 EXTRA_INCLUDES=../lib-lightset/include ../lib-properties/include ../lib-hal/include ../lib-network/include
 
