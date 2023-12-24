@@ -130,13 +130,11 @@ void main() {
 	display.Set(5, displayudf::Labels::BOARDNAME);
 	display.Set(6, displayudf::Labels::NETMASK);
 
-	StoreDisplayUdf storeDisplayUdf;
-	DisplayUdfParams displayUdfParams(&storeDisplayUdf);
+	DisplayUdfParams displayUdfParams;
 
-	if (displayUdfParams.Load()) {
-		displayUdfParams.Dump();
-		displayUdfParams.Set(&display);
-	}
+	displayUdfParams.Load();
+	displayUdfParams.Dump();
+	displayUdfParams.Set(&display);
 
 	display.Show();
 
@@ -145,10 +143,9 @@ void main() {
 	StoreRemoteConfig storeRemoteConfig;
 	RemoteConfigParams remoteConfigParams(&storeRemoteConfig);
 
-	if (remoteConfigParams.Load()) {
-		remoteConfigParams.Dump();
-		remoteConfigParams.Set(&remoteConfig);
-	}
+	remoteConfigParams.Load();
+	remoteConfigParams.Dump();
+	remoteConfigParams.Set(&remoteConfig);
 
 	while (configStore.Flash())
 		;
