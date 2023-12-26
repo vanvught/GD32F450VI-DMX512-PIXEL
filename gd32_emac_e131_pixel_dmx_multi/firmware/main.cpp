@@ -117,10 +117,8 @@ void main() {
 
 	E131Bridge bridge;
 
-	if (e131params.Load()) {
-		e131params.Dump();
-		e131params.Set(DMXPORT_OFFSET);
-	}
+	e131params.Load();
+	e131params.Set(DMXPORT_OFFSET);
 
 	// LightSet A - Pixel - 64 Universes
 
@@ -129,10 +127,8 @@ void main() {
 	StorePixelDmx storePixelDmx;
 	PixelDmxParams pixelDmxParams(&storePixelDmx);
 
-	if (pixelDmxParams.Load()) {
-		pixelDmxParams.Dump();
-		pixelDmxParams.Set(&pixelDmxConfiguration);
-	}
+	pixelDmxParams.Load();
+	pixelDmxParams.Set(&pixelDmxConfiguration);
 
 	WS28xxDmxMulti pixelDmxMulti(pixelDmxConfiguration);
 	pixelDmxMulti.SetPixelDmxHandler(new PixelDmxStartStop);
@@ -181,7 +177,6 @@ void main() {
 	Dmx dmx;
 
 	dmxparams.Load();
-	dmxparams.Dump();
 	dmxparams.Set(&dmx);
 
 	for (uint32_t nPortIndex = DMXPORT_OFFSET; nPortIndex < e131bridge::MAX_PORTS; nPortIndex++) {
@@ -228,7 +223,6 @@ void main() {
 	RDMDeviceParams rdmDeviceParams;
 
 	rdmDeviceParams.Load();
-	rdmDeviceParams.Dump();
 	rdmDeviceParams.Set(&llrpOnlyDevice);
 	
 	llrpOnlyDevice.Print();
@@ -244,7 +238,6 @@ void main() {
 	DisplayUdfParams displayUdfParams;
 
 	displayUdfParams.Load();
-	displayUdfParams.Dump();
 	displayUdfParams.Set(&display);
 
 	display.Show(&bridge, DMXPORT_OFFSET);
@@ -262,11 +255,8 @@ void main() {
 
 	RemoteConfig remoteConfig(remoteconfig::Node::E131, remoteconfig::Output::PIXEL, bridge.GetActiveOutputPorts());
 
-	StoreRemoteConfig storeRemoteConfig;
-	RemoteConfigParams remoteConfigParams(&storeRemoteConfig);
-
+	RemoteConfigParams remoteConfigParams;
 	remoteConfigParams.Load();
-	remoteConfigParams.Dump();
 	remoteConfigParams.Set(&remoteConfig);
 
 	while (configStore.Flash())

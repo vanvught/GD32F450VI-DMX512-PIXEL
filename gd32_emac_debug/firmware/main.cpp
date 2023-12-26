@@ -133,18 +133,14 @@ void main() {
 	DisplayUdfParams displayUdfParams;
 
 	displayUdfParams.Load();
-	displayUdfParams.Dump();
 	displayUdfParams.Set(&display);
 
 	display.Show();
 
 	RemoteConfig remoteConfig(remoteconfig::Node::RDMNET_LLRP_ONLY, remoteconfig::Output::CONFIG, 0);
 
-	StoreRemoteConfig storeRemoteConfig;
-	RemoteConfigParams remoteConfigParams(&storeRemoteConfig);
-
+	RemoteConfigParams remoteConfigParams;
 	remoteConfigParams.Load();
-	remoteConfigParams.Dump();
 	remoteConfigParams.Set(&remoteConfig);
 
 	while (configStore.Flash())

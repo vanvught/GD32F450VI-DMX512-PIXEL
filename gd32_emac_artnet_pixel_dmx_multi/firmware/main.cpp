@@ -123,7 +123,6 @@ void main() {
 	ArtNetParams artnetParams(&storeArtNet);
 
 	if (artnetParams.Load()) {
-		artnetParams.Dump();
 		artnetParams.Set(DMXPORT_OFFSET);
 	}
 
@@ -135,7 +134,6 @@ void main() {
 	PixelDmxParams pixelDmxParams(&storePixelDmx);
 
 	if (pixelDmxParams.Load()) {
-		pixelDmxParams.Dump();
 		pixelDmxParams.Set(&pixelDmxConfiguration);
 	}
 
@@ -182,7 +180,6 @@ void main() {
 	Dmx dmx;
 
 	dmxparams.Load();
-	dmxparams.Dump();
 	dmxparams.Set(&dmx);
 
 	for (uint32_t nPortIndex = DMXPORT_OFFSET; nPortIndex < artnetnode::MAX_PORTS; nPortIndex++) {
@@ -233,7 +230,6 @@ void main() {
 	RDMDeviceParams rdmDeviceParams;
 
 	rdmDeviceParams.Load();
-	rdmDeviceParams.Dump();
 	rdmDeviceParams.Set(&llrpOnlyDevice);
 
 	llrpOnlyDevice.Print();
@@ -248,7 +244,6 @@ void main() {
 	DisplayUdfParams displayUdfParams;
 
 	displayUdfParams.Load();
-	displayUdfParams.Dump();
 	displayUdfParams.Set(&display);
 
 	display.Show(&node, DMXPORT_OFFSET);
@@ -266,11 +261,8 @@ void main() {
 
 	RemoteConfig remoteConfig(remoteconfig::Node::ARTNET, remoteconfig::Output::PIXEL, node.GetActiveOutputPorts());
 
-	StoreRemoteConfig storeRemoteConfig;
-	RemoteConfigParams remoteConfigParams(&storeRemoteConfig);
-
+	RemoteConfigParams remoteConfigParams;
 	remoteConfigParams.Load();
-	remoteConfigParams.Dump();
 	remoteConfigParams.Set(&remoteConfig);
 
 	while (configStore.Flash())
