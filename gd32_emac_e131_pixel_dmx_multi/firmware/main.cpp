@@ -71,8 +71,7 @@
 #include "remoteconfigparams.h"
 
 #include "configstore.h"
-#include "storenetwork.h"
-#include "storeremoteconfig.h"
+
 
 #include "firmwareversion.h"
 #include "software_version.h"
