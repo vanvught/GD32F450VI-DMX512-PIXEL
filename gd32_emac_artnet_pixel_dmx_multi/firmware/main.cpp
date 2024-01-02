@@ -72,13 +72,15 @@
 #include "remoteconfigparams.h"
 
 #include "configstore.h"
-#include "storeartnet.h"
-
 
 #include "firmwareversion.h"
 #include "software_version.h"
 
-static constexpr uint32_t DMXPORT_OFFSET = 64;
+namespace artnetnode {
+namespace configstore {
+uint32_t DMXPORT_OFFSET = 64;
+}  // namespace configstore
+}  // namespace artnetnode
 
 void Hardware::RebootHandler() {
 	WS28xxMulti::Get()->Blackout();
@@ -109,14 +111,9 @@ void main() {
 
 	ArtNetNode node;
 
-	StoreArtNet storeArtNet(DMXPORT_OFFSET);
-	node.SetArtNetStore(&storeArtNet);
-
 	ArtNetParams artnetParams;
-
-	if (artnetParams.Load()) {
-		artnetParams.Set(DMXPORT_OFFSET);
-	}
+	artnetParams.Load();
+	artnetParams.Set();
 
 	// LightSet A - Pixel - 64 Universes
 
@@ -155,8 +152,8 @@ void main() {
 
 	uint32_t nDmxUniverses = 0;
 
-	for (uint32_t nPortIndex = DMXPORT_OFFSET; nPortIndex < artnetnode::MAX_PORTS; nPortIndex++) {
-		const auto nDmxPortIndex = nPortIndex - DMXPORT_OFFSET;
+	for (uint32_t nPortIndex = artnetnode::configstore::DMXPORT_OFFSET; nPortIndex < artnetnode::MAX_PORTS; nPortIndex++) {
+		const auto nDmxPortIndex = nPortIndex - artnetnode::configstore::DMXPORT_OFFSET;
 
 		if (artnetParams.GetDirection(nDmxPortIndex) == lightset::PortDir::OUTPUT) {
 			const auto Universe = artnetParams.GetUniverse(nDmxPortIndex);
@@ -165,14 +162,15 @@ void main() {
 		}
 	}
 
-	DmxParams dmxparams;
+
 	Dmx dmx;
 
+	DmxParams dmxparams;
 	dmxparams.Load();
 	dmxparams.Set(&dmx);
 
-	for (uint32_t nPortIndex = DMXPORT_OFFSET; nPortIndex < artnetnode::MAX_PORTS; nPortIndex++) {
-		const auto nDmxPortIndex = nPortIndex - DMXPORT_OFFSET;
+	for (uint32_t nPortIndex = artnetnode::configstore::DMXPORT_OFFSET; nPortIndex < artnetnode::MAX_PORTS; nPortIndex++) {
+		const auto nDmxPortIndex = nPortIndex - artnetnode::configstore::DMXPORT_OFFSET;
 
 		if (node.GetPortDirection(nPortIndex) == lightset::PortDir::OUTPUT) {
 			dmx.SetPortDirection(nDmxPortIndex, dmx::PortDirection::OUTP, false);
@@ -235,7 +233,7 @@ void main() {
 	displayUdfParams.Load();
 	displayUdfParams.Set(&display);
 
-	display.Show(&node, DMXPORT_OFFSET);
+	display.Show(&node);
 
 	display.Printf(7, "%s:%d G%d %s",
 		PixelType::GetType(pixelDmxConfiguration.GetType()),

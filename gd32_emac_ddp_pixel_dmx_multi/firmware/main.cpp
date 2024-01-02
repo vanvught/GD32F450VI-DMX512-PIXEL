@@ -124,9 +124,9 @@ void main() {
 
 	// LightSet B - DMX - 2 Universes
 
-	DmxParams dmxparams;
 	Dmx dmx;
 
+	DmxParams dmxparams;
 	dmxparams.Load();
 	dmxparams.Set(&dmx);
 

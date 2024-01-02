@@ -72,11 +72,14 @@
 
 #include "configstore.h"
 
-
 #include "firmwareversion.h"
 #include "software_version.h"
 
-static constexpr uint32_t DMXPORT_OFFSET = 64;
+namespace e131bridge {
+namespace configstore {
+uint32_t DMXPORT_OFFSET = 64;
+}  // namespace configstore
+}  // namespace e131bridge
 
 void Hardware::RebootHandler() {
 	WS28xxMulti::Get()->Blackout();
@@ -107,7 +110,7 @@ void main() {
 
 	E131Params e131params;
 	e131params.Load();
-	e131params.Set(DMXPORT_OFFSET);
+	e131params.Set();
 
 	// LightSet A - Pixel - 64 Universes
 
@@ -148,7 +151,7 @@ void main() {
 	auto direction = e131params.GetDirection(0);
 
 	if (direction == lightset::PortDir::OUTPUT) {
-		bridge.SetUniverse(DMXPORT_OFFSET, lightset::PortDir::OUTPUT, nUniverse);
+		bridge.SetUniverse(e131bridge::configstore::DMXPORT_OFFSET, lightset::PortDir::OUTPUT, nUniverse);
 		nDmxUniverses++;
 	}
 
@@ -156,19 +159,19 @@ void main() {
 	direction = e131params.GetDirection(1);
 
 	if (direction == lightset::PortDir::OUTPUT) {
-		bridge.SetUniverse(DMXPORT_OFFSET + 1U, lightset::PortDir::OUTPUT, nUniverse);
+		bridge.SetUniverse(e131bridge::configstore::DMXPORT_OFFSET + 1U, lightset::PortDir::OUTPUT, nUniverse);
 		nDmxUniverses++;
 	}
 
-	DmxParams dmxparams;
 	Dmx dmx;
 
+	DmxParams dmxparams;
 	dmxparams.Load();
 	dmxparams.Set(&dmx);
 
-	for (uint32_t nPortIndex = DMXPORT_OFFSET; nPortIndex < e131bridge::MAX_PORTS; nPortIndex++) {
+	for (uint32_t nPortIndex = e131bridge::configstore::DMXPORT_OFFSET; nPortIndex < e131bridge::MAX_PORTS; nPortIndex++) {
 		uint16_t nUniverse;
-		const auto nDmxPortIndex = nPortIndex - DMXPORT_OFFSET;
+		const auto nDmxPortIndex = nPortIndex - e131bridge::configstore::DMXPORT_OFFSET;
 
 		if (bridge.GetUniverse(nPortIndex, nUniverse, lightset::PortDir::OUTPUT)) {
 			dmx.SetPortDirection(nDmxPortIndex, dmx::PortDirection::OUTP, false);
@@ -227,7 +230,7 @@ void main() {
 	displayUdfParams.Load();
 	displayUdfParams.Set(&display);
 
-	display.Show(&bridge, DMXPORT_OFFSET);
+	display.Show(&bridge);
 
 	display.Printf(7, "%s:%d G%d %s",
 		PixelType::GetType(pixelDmxConfiguration.GetType()),
