@@ -1,8 +1,8 @@
 /**
- * @file storenetwork.cpp
+ * @file rdmnetdevice.cpp
  *
  */
-/* Copyright (C) 2018-2021 by Arjan van Vught mailto:info@orangepi-dmx.nl
+/* Copyright (C) 2019-2023 by Arjan van Vught mailto:info@orangepi-dmx.nl
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +23,31 @@
  * THE SOFTWARE.
  */
 
-#include <cassert>
+#include <cstdint>
+#include <cstdio>
+#include <uuid/uuid.h>
 
-#include "storenetwork.h"
-#include "debug.h"
+#include "rdmnetdevice.h"
+#include "llrp/llrpdevice.h"
 
-StoreNetwork *StoreNetwork::s_pThis = nullptr;
+#include "rdmpersonality.h"
+#include "lightset.h"
+#include "rdmdeviceresponder.h"
+#include "rdmhandler.h"
 
-StoreNetwork::StoreNetwork() {
-	DEBUG_ENTRY
+static constexpr auto UUID_STRING_LENGTH = 36;
 
-	assert(s_pThis == nullptr);
-	s_pThis = this;
+TRdmMessage RDMNetDevice::s_RdmCommand;
+uint8_t RDMNetDevice::s_Cid[e131::CID_LENGTH];
 
-	DEBUG_PRINTF("%p", reinterpret_cast<void *>(s_pThis));
-	DEBUG_EXIT
+void RDMNetDevice::Print() {
+	char uuid_str[UUID_STRING_LENGTH + 1];
+	uuid_str[UUID_STRING_LENGTH] = '\0';
+	uuid_unparse(s_Cid, uuid_str);
+
+	printf("RDMNet\n");
+	printf(" CID : %s\n", uuid_str);
+
+	LLRPDevice::Print();
+	RDMDeviceResponder::Print();
 }

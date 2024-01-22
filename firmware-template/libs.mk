@@ -23,31 +23,18 @@ ifeq ($(findstring NODE_DDP_DISPLAY,$(DEFINES)),NODE_DDP_DISPLAY)
 	LIBS+=ddp
 endif
 
-RDM=
-DMX=
-
 ifeq ($(findstring NODE_DMX,$(DEFINES)),NODE_DMX)
 	LIBS+=dmxreceiver
 	DMX=1
 endif
 
 ifeq ($(findstring NODE_RDMNET_LLRP_ONLY,$(DEFINES)),NODE_RDMNET_LLRP_ONLY)
-	ifneq ($(findstring rdmnet,$(LIBS)),rdmnet)
-		LIBS+=rdmnet
-	endif
+	RDM=1
 	ifneq ($(findstring e131,$(LIBS)),e131)
 		LIBS+=e131
 	endif
-	RDM=1
 endif
 
-ifdef RDM
-	LIBS+=rdm
-endif
-
-ifeq ($(findstring e131,$(LIBS)),e131)
-	LIBS+=uuid
-endif
 
 ifeq ($(findstring OUTPUT_DMX_MONITOR,$(DEFINES)),OUTPUT_DMX_MONITOR)
 	LIBS+=dmxmonitor	
@@ -58,8 +45,16 @@ ifeq ($(findstring OUTPUT_DMX_SEND,$(DEFINES)),OUTPUT_DMX_SEND)
 	DMX=1
 endif
 
+ifdef RDM
+	LIBS+=rdm
+endif
+
 ifdef DMX
 	LIBS+=dmx
+endif
+
+ifeq ($(findstring e131,$(LIBS)),e131)
+	LIBS+=uuid
 endif
 
 ifeq ($(findstring OUTPUT_DDP_PIXEL_MULTI,$(DEFINES)),OUTPUT_DDP_PIXEL_MULTI)
