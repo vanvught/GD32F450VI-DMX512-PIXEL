@@ -1,8 +1,8 @@
 /**
- * @file pixeldmxstartstop.h
+ * @file board_gd32f470z_eval.h
  *
  */
-/* Copyright (C) 2020-2023 by Arjan van Vught mailto:info@orangepi-dmx.nl
+/* Copyright (C) 2024 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,31 +23,28 @@
  * THE SOFTWARE.
  */
 
-#ifndef WS28XXDMXSTARTSTOP_H_
-#define WS28XXDMXSTARTSTOP_H_
+#ifndef GD32_BOARD_GD32F470Z_EVAL_H_
+#define GD32_BOARD_GD32F470Z_EVAL_H_
 
-#include "pixeldmxhandler.h"
+#include "gd32_board.h"
 
-#include "hal_gpio.h"
+namespace max {
+static constexpr auto OUT = 2U;
+static constexpr auto IN = 2U;
+}
 
-#define GPIO_START_STOP		GPIO_EXT_12
+#define DMX_MAX_PORTS  2
 
-class PixelDmxStartStop final: public PixelDmxHandler {
-public:
-	PixelDmxStartStop() {
-		FUNC_PREFIX(gpio_fsel(GPIO_START_STOP, GPIO_FSEL_OUTPUT));
-		FUNC_PREFIX(gpio_clr(GPIO_START_STOP));
-	}
+#define DMX_USE_USART2
+#define DMX_USE_USART5
 
-	~PixelDmxStartStop() override  = default;
+static constexpr auto USART2_PORT = 0;
+static constexpr auto USART5_PORT = 1;
 
-	void Start() override {
-		FUNC_PREFIX(gpio_set(GPIO_START_STOP));
-	}
+static constexpr auto DIR_PORT_0_GPIO_PORT = GPIOD;
+static constexpr auto DIR_PORT_0_GPIO_PIN = GPIO_PIN_0;		///< Not used
 
-	void Stop() override {
-		FUNC_PREFIX(gpio_clr(GPIO_START_STOP));
-	}
-};
+static constexpr auto DIR_PORT_1_GPIO_PORT = GPIOD;
+static constexpr auto DIR_PORT_1_GPIO_PIN = GPIO_PIN_1;		///< Not used
 
-#endif /* WS28XXDMXSTARTSTOP_H_ */
+#endif /* GD32_BOARD_GD32F470Z_EVAL_H_ */

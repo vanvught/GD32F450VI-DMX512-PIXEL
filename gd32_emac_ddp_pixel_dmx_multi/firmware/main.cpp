@@ -2,7 +2,7 @@
  * @file main.cpp
  *
  */
-/* Copyright (C) 2022-2023 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2022-2024 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,9 +44,9 @@
 #include "pixeltype.h"
 #include "pixeltestpattern.h"
 #include "pixeldmxparams.h"
+
 #include "ws28xxmulti.h"
 #include "ws28xxdmxmulti.h"
-#include "ws28xxdmxstartstop.h"
 
 #include "dmxparams.h"
 #include "dmxsend.h"
@@ -103,7 +103,6 @@ void main() {
 	pixelDmxParams.Set(&pixelDmxConfiguration);
 
 	WS28xxDmxMulti pixelDmxMulti(pixelDmxConfiguration);
-	pixelDmxMulti.SetPixelDmxHandler(new PixelDmxStartStop);
 
 	DdpDisplay ddpDisplay;
 
@@ -124,8 +123,6 @@ void main() {
 
 	DmxSend dmxSend;
 	dmxSend.Print();
-
-	DmxConfigUdp dmxConfigUdp;
 
 	// LightSet 64with4
 
@@ -211,7 +208,6 @@ void main() {
 		if (__builtin_expect((PixelTestPattern::GetPattern() != pixelpatterns::Pattern::NONE), 0)) {
 			pixelTestPattern.Run();
 		}
-		dmxConfigUdp.Run();
 		mDns.Run();
 #if defined (NODE_RDMNET_LLRP_ONLY)
 		llrpOnlyDevice.Run();
