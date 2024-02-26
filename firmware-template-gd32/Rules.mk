@@ -9,30 +9,25 @@ LD	 = $(PREFIX)ld
 AR	 = $(PREFIX)ar
 
 BOARD?=BOARD_GD32F450VI
-ENET_PHY?=DP83848
+ENET_PHY?=RTL8201F
 
-# Output 
 TARGET=$(FAMILY).bin
 LIST=$(FAMILY).list
 MAP=$(FAMILY).map
 SIZE=$(FAMILY).size
 BUILD=build_gd32/
 
-# Input
-SOURCE=./
 FIRMWARE_DIR=./../firmware-template-gd32/
 
 DEFINES:=$(addprefix -D,$(DEFINES))
 
-MCU=GD32F450VI
-
+include ../firmware-template-gd32/Board.mk
 include ../firmware-template-gd32/Mcu.mk
 include ../firmware-template/libs.mk
-
-LIBS+=c++ c gd32
-
 include ../firmware-template-gd32/Includes.mk
 include ../firmware-template-gd32/Artnet.mk
+
+LIBS+=c++ c gd32
 
 # The variable for the libraries include directory
 LIBINCDIRS:=$(addprefix -I../lib-,$(LIBS))
@@ -48,21 +43,13 @@ LDLIBS:=$(addprefix -l,$(LIBS))
 # The variables for the dependency check
 LIBDEP=$(addprefix ../lib-,$(LIBS))
 
-$(info $$BOARD [${BOARD}])
-$(info $$ENET_PHY [${ENET_PHY}])
-$(info $$DEFINES [${DEFINES}])
-$(info $$LIBS [${LIBS}])
-$(info $$LIBDEP [${LIBDEP}])
-
-COPS=-DBARE_METAL -DGD32 -D$(FAMILY_UCA) -D$(LINE_UC) -D$(MCU) -D$(BOARD) -DPHY_TYPE=$(ENET_PHY)
-COPS+=$(DEFINES) $(MAKE_FLAGS) $(INCLUDES) $(LIBINCDIRS)
-COPS+=-D__Vendor_SysTickConfig=0
-COPS+=-Os -mcpu=cortex-m4 -mthumb -g -mfloat-abi=hard -fsingle-precision-constant -mfpu=fpv4-sp-d16 -DARM_MATH_CM4 -D__FPU_PRESENT=1
-COPS+=-nostartfiles -ffreestanding -nostdlib
+COPS=-DGD32 -D$(FAMILY_UCA) -D$(LINE_UC) -D$(MCU) -D$(BOARD) -DPHY_TYPE=$(ENET_PHY)
+COPS+=$(strip $(DEFINES) $(MAKE_FLAGS) $(INCLUDES) $(LIBINCDIRS))
+COPS+=$(strip $(ARMOPS) $(CMSISOPS))
+COPS+=-Os -nostartfiles -ffreestanding -nostdlib
 COPS+=-fstack-usage
 COPS+=-ffunction-sections -fdata-sections
-COPS+=-Wall -Werror -Wpedantic -Wextra -Wunused -Wsign-conversion -Wconversion
-COPS+=-Wduplicated-cond -Wlogical-op
+COPS+=-Wall -Werror -Wpedantic -Wextra -Wunused -Wsign-conversion -Wconversion -Wduplicated-cond -Wlogical-op
 
 CPPOPS=-std=c++20
 CPPOPS+=-Wnon-virtual-dtor -Woverloaded-virtual -Wnull-dereference -fno-rtti -fno-exceptions -fno-unwind-tables
@@ -86,13 +73,13 @@ BUILD_DIRS:=$(addprefix $(BUILD),$(SRCDIR))
 OBJECTS:=$(ASM_OBJECTS) $(C_OBJECTS)
 
 define compile-objects
-$(BUILD)$1/%.o: $(SOURCE)$1/%.cpp
+$(BUILD)$1/%.o: $1/%.cpp
 	$(CPP) $(COPS) $(CPPOPS) -c $$< -o $$@
 
-$(BUILD)$1/%.o: $(SOURCE)$1/%.c
+$(BUILD)$1/%.o: $1/%.c
 	$(CC) $(COPS) -c $$< -o $$@
 
-$(BUILD)$1/%.o: $(SOURCE)$1/%.S
+$(BUILD)$1/%.o: $1/%.S
 	$(CC) $(COPS) -D__ASSEMBLY__ -c $$< -o $$@
 endef
 
@@ -143,7 +130,7 @@ $(BUILD)main.elf: Makefile.GD32 $(LINKER) $(BUILD)startup_$(LINE).o $(BUILD)hard
 	$(MAKE) -f Makefile.GD32 calculate_unused_ram SIZE_FILE=$(FAMILY).size LINKER_SCRIPT=$(LINKER)
 
 $(TARGET) : $(BUILD)main.elf
-	$(PREFIX)objcopy $(BUILD)main.elf -O binary $(TARGET) --remove-section=.tcmsram* --remove-section=.ram* --remove-section=.sram1* --remove-section=.sram2* --remove-section=.ramadd* --remove-section=.bkpsram*
+	$(PREFIX)objcopy $(BUILD)main.elf -O binary $(TARGET) --remove-section=.tcmsram* --remove-section=.sram1* --remove-section=.sram2* --remove-section=.ramadd* --remove-section=.bkpsram*
 
 $(foreach bdir,$(SRCDIR),$(eval $(call compile-objects,$(bdir))))
 

@@ -10,7 +10,7 @@ LD	= $(PREFIX)ld
 AR	= $(PREFIX)ar
 
 BOARD?=BOARD_GD32F450VI
-ENET_PHY?=DP83848
+ENET_PHY?=RTL8201F
 
 $(info $$BOARD [${BOARD}])
 $(info $$ENET_PHY [${ENET_PHY}])
@@ -20,34 +20,25 @@ SRCDIR=src src/gd32 $(EXTRA_SRCDIR)
 DEFINES:=$(addprefix -D,$(DEFINES))
 DEFINES+=-D_TIME_STAMP_YEAR_=$(shell date  +"%Y") -D_TIME_STAMP_MONTH_=$(shell date  +"%-m") -D_TIME_STAMP_DAY_=$(shell date  +"%-d")
 
-MCU=GD32F450VI
-
+include ../firmware-template-gd32/Board.mk
 include ../firmware-template-gd32/Mcu.mk
 include ../firmware-template-gd32/Includes.mk
 include ../firmware-template-gd32/Artnet.mk
 
 INCLUDES+=-I../lib-configstore/include -I../lib-device/include -I../lib-display/include -I../lib-flash/include -I../lib-flashcode/include -I../lib-hal/include -I../lib-lightset/include -I../lib-network/include
 
-$(info $$DEFINES [${DEFINES}])
-$(info $$MAKE_FLAGS [${MAKE_FLAGS}])
-
-COPS=-DBARE_METAL -DGD32 -D$(FAMILY_UCA) -D$(LINE_UC) -D$(MCU) -D$(BOARD) -DPHY_TYPE=$(ENET_PHY)
+COPS=-DGD32 -D$(FAMILY_UCA) -D$(LINE_UC) -D$(MCU) -D$(BOARD) -DPHY_TYPE=$(ENET_PHY)
 COPS+=$(strip $(DEFINES)) $(MAKE_FLAGS) $(INCLUDES)
-COPS+=-Os -mcpu=cortex-m4 -mthumb -g -mfloat-abi=hard -fsingle-precision-constant -mfpu=fpv4-sp-d16
-COPS+=-D__Vendor_SysTickConfig=0 -DARM_MATH_CM4 -D__FPU_PRESENT=1
-COPS+=-nostartfiles -ffreestanding -nostdlib
+COPS+=$(strip $(ARMOPS) $(CMSISOPS))
+COPS+=-Os -nostartfiles -ffreestanding -nostdlib
 COPS+=-fstack-usage
 COPS+=-ffunction-sections -fdata-sections
-COPS+=-Wall -Werror -Wpedantic -Wextra -Wunused -Wsign-conversion -Wconversion
-COPS+=-Wduplicated-cond -Wlogical-op
+COPS+=-Wall -Werror -Wpedantic -Wextra -Wunused -Wsign-conversion -Wconversion -Wduplicated-cond -Wlogical-op
 
 CPPOPS=-std=c++20
 CPPOPS+=-Wnon-virtual-dtor -Woverloaded-virtual -Wnull-dereference -fno-rtti -fno-exceptions -fno-unwind-tables
 CPPOPS+=-Wuseless-cast -Wold-style-cast
 CPPOPS+=-fno-threadsafe-statics
-
-CURR_DIR:=$(notdir $(patsubst %/,%,$(CURDIR)))
-LIB_NAME:=$(patsubst lib-%,%,$(CURR_DIR))
 
 BUILD=build_gd32/
 BUILD_DIRS:=$(addprefix build_gd32/,$(SRCDIR))
@@ -63,12 +54,14 @@ EXTRA_BUILD_DIRS:=$(addsuffix $(EXTRA_C_DIRECTORIES), $(BUILD))
 
 OBJECTS:=$(strip $(ASM_OBJECTS) $(C_OBJECTS) $(CPP_OBJECTS) $(EXTRA_C_OBJECTS))
 
-$(info $$OBJECTS [${OBJECTS}])
-
+CURR_DIR:=$(notdir $(patsubst %/,%,$(CURDIR)))
+LIB_NAME:=$(patsubst lib-%,%,$(CURR_DIR))
 TARGET=lib_gd32/lib$(LIB_NAME).a
-$(info $$TARGET [${TARGET}])
 
-LIST=lib.list
+$(info $$DEFINES [${DEFINES}])
+$(info $$MAKE_FLAGS [${MAKE_FLAGS}])
+$(info $$OBJECTS [${OBJECTS}])
+$(info $$TARGET [${TARGET}])
 
 define compile-objects
 $(info $1)
@@ -104,6 +97,6 @@ $(BUILD_DIRS) :
 	
 $(TARGET): Makefile.GD32 $(OBJECTS)
 	$(AR) -r $(TARGET) $(OBJECTS)
-	$(PREFIX)objdump -d $(TARGET) | $(PREFIX)c++filt > lib_gd32/$(LIST)
+	$(PREFIX)objdump -d $(TARGET) | $(PREFIX)c++filt > lib_gd32/lib.list
 	
 $(foreach bdir,$(SRCDIR),$(eval $(call compile-objects,$(bdir))))
