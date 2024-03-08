@@ -75,9 +75,7 @@
  */
 
 #define I2C0_REMAP
-#if defined (I2C0_REMAP)
-# define I2C_REMAP			GPIO_I2C0_REMAP
-#endif
+#define I2C_REMAP			GPIO_I2C0_REMAP
 #define I2C_PERIPH			I2C0_PERIPH
 #define I2C_RCU_CLK			I2C0_RCU_CLK
 #define I2C_GPIO_SCL_PORT	I2C0_SCL_GPIOx
@@ -91,22 +89,24 @@
  * SPI
  */
 
-#if defined (SPI2_REMAP)
-# define SPI_REMAP			SPI2_REMAP_GPIO
-#endif
 #define SPI_PERIPH			SPI2_PERIPH
-#define SPI_NSS_GPIOx		SPI2_NSS_GPIOx
-#define SPI_NSS_RCU_GPIOx	SPI2_NSS_RCU_GPIOx
-#define SPI_NSS_GPIO_PINx	SPI2_NSS_GPIO_PINx
 #define SPI_RCU_CLK			SPI2_RCU_CLK
-#define SPI_GPIOx			SPI2_GPIOx
 #define SPI_RCU_GPIOx		SPI2_RCU_GPIOx
+#define SPI_GPIO_AF			SPI2_GPIO_AF
+#define SPI_GPIOx			SPI2_GPIOx
 #define SPI_SCK_PIN			SPI2_SCK_GPIO_PINx
 #define SPI_MISO_PIN		SPI2_MISO_GPIO_PINx
 #define SPI_MOSI_PIN		SPI2_MOSI_GPIO_PINx
+#define SPI_NSS_GPIOx		SPI2_NSS_GPIOx
+#define SPI_NSS_RCU_GPIOx	SPI2_NSS_RCU_GPIOx
+#define SPI_NSS_GPIO_PINx	SPI2_NSS_GPIO_PINx
 #define SPI_DMAx			SPI2_DMAx
 #define SPI_DMA_CHx			SPI2_TX_DMA_CHx
 #define SPI_DMA_SUBPERIx	SPI2_TX_DMA_SUBPERIx
+
+/**
+ * U(S)ART
+ */
 
 /**
  * Panel LEDs
@@ -136,9 +136,9 @@ static constexpr uint32_t PORT_A_TX = 0;
  * SPI flash
  */
 
-#define SPI_FLASH_CS_GPIOx		GPIOD
-#define SPI_FLASH_CS_RCU_GPIOx	RCU_GPIOD
-#define SPI_FLASH_CS_GPIO_PINx	GPIO_PIN_0
+#define SPI_FLASH_CS_GPIOx			GPIOD
+#define SPI_FLASH_CS_RCU_GPIOx		RCU_GPIOD
+#define SPI_FLASH_CS_GPIO_PINx		GPIO_PIN_0
 
 /**
  * EXT PHY
