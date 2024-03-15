@@ -1,8 +1,8 @@
 /**
- * @file  systick.c
+ * @file json_get_portstatus.cpp
  *
  */
-/* Copyright (C) 2021-2024 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2024 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,31 @@
  */
 
 #include <cstdint>
+#include <cstdio>
 
-#include "gd32.h"
+#include "dmx.h"
+#include "dmxconst.h"
 
-volatile uint32_t s_nSysTickMillis;
+namespace remoteconfig {
+namespace dmx {
+uint32_t json_get_portstatus(const char cPort, char *pOutBuffer, const uint32_t nOutBufferSize) {
+	const uint32_t nPortIndex = (cPort | 0x20) - 'a';
 
-extern "C" {
-void systick_config() {
-	/* Setup systick timer for 1000Hz interrupts */
-	if (SysTick_Config(SystemCoreClock / 1000U)) {
-		while (1) {
-		}
+	if (nPortIndex < ::dmx::config::max::PORTS) {
+		auto& statistics = Dmx::Get()->GetTotalStatistics(nPortIndex);
+		auto nLength = static_cast<uint32_t>(snprintf(pOutBuffer, nOutBufferSize,
+				"{\"port\":\"%c\","
+				"\"dmx\":{\"sent\":\"%u\",\"received\":\"%u\"},"
+				"\"rdm\":{\"sent\":{\"class\":\"%u\",\"discovery\":\"%u\"},\"received\":{\"good\":\"%u\",\"bad\":\"%u\",\"discovery\":\"%u\"}}}",
+				'A' + nPortIndex,
+				statistics.Dmx.Sent,statistics.Dmx.Received,
+				statistics.Rdm.Sent.Class, statistics.Rdm.Sent.DiscoveryResponse,
+				statistics.Rdm.Received.Good, statistics.Rdm.Received.Bad, statistics.Rdm.Received.DiscoveryResponse));
+
+		return nLength;
 	}
 
-	NVIC_SetPriority(SysTick_IRQn, (1UL<<__NVIC_PRIO_BITS)-1UL); // Lowest priority
+	return 0;
 }
-
-void SysTick_Handler() {
-	s_nSysTickMillis++;
-}
-}
+}  // namespace dmx
+}  // namespace remoteconfig

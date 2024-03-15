@@ -1,8 +1,8 @@
 /**
- * @file  systick.c
+ * @file dmxstatistics.h
  *
  */
-/* Copyright (C) 2021-2024 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2024 by Arjan van Vught mailto:info@orangepi-dmx.nl
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,24 +23,30 @@
  * THE SOFTWARE.
  */
 
+#ifndef DMXSTATISTICS_H_
+#define DMXSTATISTICS_H_
+
 #include <cstdint>
 
-#include "gd32.h"
+namespace dmx {
+struct TotalStatistics {
+	struct  {
+		uint32_t Sent;
+		uint32_t Received;
+	} Dmx;
 
-volatile uint32_t s_nSysTickMillis;
+	struct {
+		struct  {
+			uint32_t Good;
+			uint32_t Bad;
+			uint32_t DiscoveryResponse;
+		} Received;
+		struct  {
+			uint32_t Class;
+			uint32_t DiscoveryResponse;
+		} Sent;
+	} Rdm;
+};
+}  // namespace dmx
 
-extern "C" {
-void systick_config() {
-	/* Setup systick timer for 1000Hz interrupts */
-	if (SysTick_Config(SystemCoreClock / 1000U)) {
-		while (1) {
-		}
-	}
-
-	NVIC_SetPriority(SysTick_IRQn, (1UL<<__NVIC_PRIO_BITS)-1UL); // Lowest priority
-}
-
-void SysTick_Handler() {
-	s_nSysTickMillis++;
-}
-}
+#endif /* DMXSTATISTICS_H_ */

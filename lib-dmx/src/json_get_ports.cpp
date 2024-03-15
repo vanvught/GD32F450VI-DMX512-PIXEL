@@ -1,8 +1,8 @@
 /**
- * @file  systick.c
+ * @file json_get_ports.cpp
  *
  */
-/* Copyright (C) 2021-2024 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2024 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,35 @@
  */
 
 #include <cstdint>
+#include <cstdio>
 
-#include "gd32.h"
+#include "dmx.h"
+#include "dmxconst.h"
+#include "lightset.h"
 
-volatile uint32_t s_nSysTickMillis;
+namespace remoteconfig {
+namespace dmx {
+static uint32_t get_portstatus(const uint32_t nPortIndex, char *pOutBuffer, const uint32_t nOutBufferSize) {
+	const auto direction = Dmx::Get()->GetPortDirection(nPortIndex) == ::dmx::PortDirection::INP ? ::lightset::PortDir::INPUT : ::lightset::PortDir::OUTPUT;
+	auto nLength = static_cast<uint32_t>(snprintf(pOutBuffer, nOutBufferSize,
+			"{\"port\":\"%c\",\"direction\":\"%s\"},",
+			'A' + nPortIndex,
+			lightset::get_direction(direction)));
 
-extern "C" {
-void systick_config() {
-	/* Setup systick timer for 1000Hz interrupts */
-	if (SysTick_Config(SystemCoreClock / 1000U)) {
-		while (1) {
-		}
+	return nLength;
+}
+
+uint32_t json_get_ports(char *pOutBuffer, const uint32_t nOutBufferSize) {
+	pOutBuffer[0] = '[';
+	uint32_t nLength = 1;
+
+	for (uint32_t nPortIndex = 0; nPortIndex < ::dmx::config::max::PORTS; nPortIndex++) {
+		nLength += get_portstatus(nPortIndex, &pOutBuffer[nLength], nOutBufferSize - nLength);
 	}
 
-	NVIC_SetPriority(SysTick_IRQn, (1UL<<__NVIC_PRIO_BITS)-1UL); // Lowest priority
-}
+	pOutBuffer[nLength - 1] = ']';
 
-void SysTick_Handler() {
-	s_nSysTickMillis++;
+	return nLength;
 }
-}
+}  // namespace dmx
+}  // namespace remoteconfig

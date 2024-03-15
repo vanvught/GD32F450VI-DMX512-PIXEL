@@ -1,8 +1,8 @@
 /**
- * @file console.c
+ * @file console.cpp
  *
  */
-/* Copyright (C) 2022-2023 by Arjan van Vught mailto:info@orangepi-dmx.nl
+/* Copyright (C) 2022-2024 by Arjan van Vught mailto:info@orangepi-dmx.nl
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,8 @@
  * THE SOFTWARE.
  */
 
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
+#include <cstdint>
+#include <cstddef>
 
 #include "console.h"
 
@@ -34,57 +33,57 @@
 static bool s_isConnected;
 
 #if !defined (CONSOLE_I2C_ADDRESS)
-# define CONSOLE_I2C_ADDRESS			((uint8_t)0x4D)
+# define CONSOLE_I2C_ADDRESS			(0x4D)
 #endif
 
 #if !defined (CONSOLE_I2C_ONBOARD_CRYSTAL)
-# define CONSOLE_I2C_ONBOARD_CRYSTAL	14745600UL
+# define CONSOLE_I2C_ONBOARD_CRYSTAL	(14745600UL)
 #endif
 
 #if !defined (CONSOLE_I2C_BAUDRATE)
-# define CONSOLE_I2C_BAUDRATE			115200U
+# define CONSOLE_I2C_BAUDRATE			(115200U)
 #endif
 
 #define SC16IS7X0_REG_SHIFT		3
 
-#define	SC16IS7X0_THR		((uint8_t)(0x00 << SC16IS7X0_REG_SHIFT))
-#define	SC16IS7X0_FCR 		((uint8_t)(0x02 << SC16IS7X0_REG_SHIFT))
-#define	SC16IS7X0_LCR		((uint8_t)(0x03 << SC16IS7X0_REG_SHIFT))
-#define	SC16IS7X0_MCR		((uint8_t)(0x04 << SC16IS7X0_REG_SHIFT))
-#define	SC16IS7X0_SPR		((uint8_t)(0x07 << SC16IS7X0_REG_SHIFT))
-#define	SC16IS7X0_TLR		((uint8_t)(0x07 << SC16IS7X0_REG_SHIFT))
-#define	SC16IS7X0_TXLVL		((uint8_t)(0x08 << SC16IS7X0_REG_SHIFT))
+#define	SC16IS7X0_THR		(0x00 << SC16IS7X0_REG_SHIFT)
+#define	SC16IS7X0_FCR 		(0x02 << SC16IS7X0_REG_SHIFT)
+#define	SC16IS7X0_LCR		(0x03 << SC16IS7X0_REG_SHIFT)
+#define	SC16IS7X0_MCR		(0x04 << SC16IS7X0_REG_SHIFT)
+#define	SC16IS7X0_SPR		(0x07 << SC16IS7X0_REG_SHIFT)
+#define	SC16IS7X0_TLR		(0x07 << SC16IS7X0_REG_SHIFT)
+#define	SC16IS7X0_TXLVL		(0x08 << SC16IS7X0_REG_SHIFT)
 
-#define	SC16IS7X0_DLL		((uint8_t)(0x00 << SC16IS7X0_REG_SHIFT))
-#define	SC16IS7X0_DLH		((uint8_t)(0x01 << SC16IS7X0_REG_SHIFT))
-#define	SC16IS7X0_EFR		((uint8_t)(0x02 << SC16IS7X0_REG_SHIFT))
+#define	SC16IS7X0_DLL		(0x00 << SC16IS7X0_REG_SHIFT)
+#define	SC16IS7X0_DLH		(0x01 << SC16IS7X0_REG_SHIFT)
+#define	SC16IS7X0_EFR		(0x02 << SC16IS7X0_REG_SHIFT)
 
 /** See section 8.3 of the datasheet for definitions
  * of bits in the FIFO Control Register (FCR)
  */
-#define FCR_TX_FIFO_RST		((uint8_t)(1U << 2))
-#define FCR_ENABLE_FIFO		((uint8_t)(1U << 0))
+#define FCR_TX_FIFO_RST		(1U << 2)
+#define FCR_ENABLE_FIFO		(1U << 0)
 
 /** See section 8.4 of the datasheet for definitions
  * of bits in the Line Control Register (LCR)
  */
 
-#define LCR_BITS8			((uint8_t)0x03)
-#define LCR_BITS1			((uint8_t)0x00)
-#define LCR_NONE			((uint8_t)0x00)
-#define	LCR_ENABLE_DIV		((uint8_t)0x80)
+#define LCR_BITS8			(0x03)
+#define LCR_BITS1			(0x00)
+#define LCR_NONE			(0x00)
+#define	LCR_ENABLE_DIV		(0x80)
 
 /**
  * 8.6 Modem Control Register (MCR)
  */
 //MCR[2] only accessible when EFR[4] is set
-#define	MCR_ENABLE_TCR_TLR	((uint8_t)(1U << 2))
-#define	MCR_PRESCALE_4		((uint8_t)(1U << 7))
+#define	MCR_ENABLE_TCR_TLR	(1U << 2)
+#define	MCR_PRESCALE_4		(1U << 7)
 
 /**
  * 8.11 Enhanced Features Register (EFR)
  */
-#define	EFR_ENABLE_ENHANCED_FUNCTIONS	((uint8_t)(1U << 4))
+#define	EFR_ENABLE_ENHANCED_FUNCTIONS	(1U << 4)
 
 static bool is_connected(const uint8_t address, const uint32_t baudrate) {
 	char buf;
@@ -97,7 +96,7 @@ static bool is_connected(const uint8_t address, const uint32_t baudrate) {
 	}
 
 	/* This is known to corrupt the Atmel AT24RF08 EEPROM */
-	return FUNC_PREFIX(i2c_write(NULL, 0)) == 0;
+	return FUNC_PREFIX(i2c_write(nullptr, 0)) == 0;
 }
 
 static void setup() {
@@ -108,8 +107,8 @@ static void setup() {
 static void write_register(uint8_t nRegister, uint8_t nValue) {
 	char buffer[2];
 
-	buffer[0] = (char)(nRegister);
-	buffer[1] = (char)(nValue);
+	buffer[0] = static_cast<char>(nRegister);
+	buffer[1] = static_cast<char>(nValue);
 
 	setup();
 	FUNC_PREFIX(i2c_write(buffer, 2));
@@ -121,13 +120,13 @@ static uint8_t read_byte() {
 	setup();
 	FUNC_PREFIX(i2c_read(buffer, 1));
 
-	return (uint8_t) (buffer[0]);
+	return static_cast<uint8_t>(buffer[0]);
 }
 
 static uint8_t read_register(uint8_t nRegister) {
 	char buffer[1];
 
-	buffer[0] = (char) (nRegister);
+	buffer[0] = static_cast<char>(nRegister);
 
 	setup();
 	FUNC_PREFIX(i2c_write(buffer, 1));
@@ -135,7 +134,7 @@ static uint8_t read_register(uint8_t nRegister) {
 	return read_byte();
 }
 
-inline static bool is_writable() {
+static bool is_writable() {
 	return (read_register(SC16IS7X0_TXLVL) != 0);
 }
 
@@ -157,7 +156,8 @@ static void set_baud(uint32_t nBaud) {
 	write_register(SC16IS7X0_LCR, nRegisterLCR);
 }
 
-void __attribute__((cold)) console_init(void) {
+extern "C" {
+void __attribute__((cold)) console_init() {
 	FUNC_PREFIX(i2c_begin());
 
 	s_isConnected = is_connected(CONSOLE_I2C_ADDRESS, 100000);
@@ -303,14 +303,15 @@ void console_set_bg_color(uint16_t bg) {
 	}
 }
 
-void console_status(uint32_t color, const char *s) {
+void console_status(uint32_t nColour, const char *s) {
 	if (!s_isConnected) {
 		return;
 	}
 
-	console_set_fg_color((uint16_t) color);
+	console_set_fg_color(static_cast<uint16_t>(nColour));
 	console_set_bg_color(CONSOLE_BLACK);
 	console_puts(s);
 	console_putc('\n');
 	console_set_fg_color(CONSOLE_WHITE);
+}
 }
