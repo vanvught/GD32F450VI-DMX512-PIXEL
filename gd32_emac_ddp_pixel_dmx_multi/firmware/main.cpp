@@ -135,7 +135,7 @@ void main() {
 
 	// LightSet 64with4
 
-	LightSet64with4 lightSet((PixelTestPattern::GetPattern() != pixelpatterns::Pattern::NONE) ? nullptr : &pixelDmxMulti, &dmxSend);
+	LightSet64with4 lightSet((PixelTestPattern::Get()->GetPattern() != pixelpatterns::Pattern::NONE) ? nullptr : &pixelDmxMulti, &dmxSend);
 	lightSet.Print();
 
 	ddpDisplay.SetOutput(&lightSet);
@@ -214,9 +214,7 @@ void main() {
 		ddpDisplay.Run();
 		remoteConfig.Run();
 		configStore.Flash();
-		if (__builtin_expect((PixelTestPattern::GetPattern() != pixelpatterns::Pattern::NONE), 0)) {
-			pixelTestPattern.Run();
-		}
+		pixelTestPattern.Run();
 		mDns.Run();
 #if defined (ENABLE_NTP_CLIENT)
 		ntpClient.Run();
