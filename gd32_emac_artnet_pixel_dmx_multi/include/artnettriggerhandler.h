@@ -2,7 +2,7 @@
  * @file artnettriggerhandler.h
  *
  */
-/* Copyright (C) 2022 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2022-2024 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,11 +33,11 @@
 #include "displayudf.h"
 #include "artnetnode.h"
 #include "lightset.h"
-#include "lightset64with4.h"
+#include "lightsetwith4.h"
 
 class ArtNetTriggerHandler: ArtNetTrigger {
 public:
-	ArtNetTriggerHandler(LightSet64with4 *pLightSet64with4, LightSet *pLightSetA): m_pLightSet64with4(pLightSet64with4), m_pLightSetA(pLightSetA) {
+	ArtNetTriggerHandler(LightSetWith4<64> *pLightSet64with4, LightSet *pLightSetA): m_pLightSet64with4(pLightSet64with4), m_pLightSetA(pLightSetA) {
 		ArtNetNode::Get()->SetArtNetTrigger(this);
 	}
 
@@ -68,7 +68,7 @@ public:
 	}
 
 private:
-	LightSet64with4 *m_pLightSet64with4;
+	LightSetWith4<64> *m_pLightSet64with4;
 	LightSet *m_pLightSetA;
 };
 

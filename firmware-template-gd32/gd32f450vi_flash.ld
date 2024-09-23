@@ -13,8 +13,8 @@ ENTRY(Reset_Handler)
 
 SECTIONS
 {
-  __heap_size = DEFINED(__heap_size) ? __heap_size : 4K;
-  __stack_size = DEFINED(__stack_size) ? __stack_size : 16K;
+  __heap_size = DEFINED(__heap_size) ? __heap_size : 8K;
+  __stack_size = DEFINED(__stack_size) ? __stack_size : 24K;
 
   .vectors :
   {
@@ -39,23 +39,6 @@ SECTIONS
     KEEP (*(.fini))
     . = ALIGN(4);
     _etext = .;
-    
-    . = ALIGN(8);
-     
-    PROVIDE_HIDDEN (__preinit_array_start = .);
-    KEEP (*(.preinit_array*))
-    PROVIDE_HIDDEN (__preinit_array_end = .);
-
-    PROVIDE_HIDDEN (__init_array_start = .);
-    KEEP (*(SORT(.init_array.*)))
-    KEEP (*(.init_array*))
-    PROVIDE_HIDDEN (__init_array_end = .);
-
-    PROVIDE_HIDDEN (__fini_array_start = .);
-    KEEP (*(.fini_array*))
-    KEEP (*(SORT(.fini_array.*)))
-    PROVIDE_HIDDEN (__fini_array_end = .);
-    
   } >FLASH
 
   .rodata :
@@ -66,6 +49,29 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
   
+  .preinit_array :
+  {
+    PROVIDE_HIDDEN (__preinit_array_start = .);
+    KEEP (*(.preinit_array*))
+    PROVIDE_HIDDEN (__preinit_array_end = .);
+  } >FLASH
+  
+  .init_array :
+  {
+    PROVIDE_HIDDEN (__init_array_start = .);
+    KEEP (*(SORT(.init_array.*)))
+    KEEP (*(.init_array*))
+    PROVIDE_HIDDEN (__init_array_end = .);
+  } >FLASH
+  
+  .fini_array :
+  {
+    PROVIDE_HIDDEN (__fini_array_start = .);
+    KEEP (*(.fini_array*))
+    KEEP (*(SORT(.fini_array.*)))
+    PROVIDE_HIDDEN (__fini_array_end = .);
+  } >FLASH
+
   .stack :
   {
 	. = ALIGN(4);
@@ -156,7 +162,7 @@ SECTIONS
   . = ALIGN(8);
   PROVIDE ( end = _ebss );
   PROVIDE ( _end = _ebss );
-  
+
   .ramadd :
   {
     _sramadd = .;
@@ -169,7 +175,7 @@ SECTIONS
 
   .bkpsram :
   {
-  	. = ALIGN(4);
+    . = ALIGN(4);
     *(.bkpsram)
     *(.bkpsram*)
     *(.configstore*)
@@ -177,11 +183,10 @@ SECTIONS
 
   /DISCARD/ :
   {
-	*(*.ARM.*)
+    *(*.ARM.*)
 	*(*.comment)
 	*(*.debug*)
   }
 }
 
- /* input sections */
-GROUP(libgcc.a libc.a)
+GROUP(libgcc.a)
