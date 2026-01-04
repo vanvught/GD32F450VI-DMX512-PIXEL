@@ -16,8 +16,6 @@ Full documentation will be available here -> [https://www.gd32-dmx.org](https://
 
 The ready to use firmware is build to use with the bootloader TFTP server -> [https://github.com/vanvught/GD32F450VI-Bootloader-TFTP](https://github.com/vanvught/GD32F450VI-Bootloader-TFTP)
 
-HTTP/JSON Remote configuration ([RNC](https://github.com/hippyau/rnc))
-
-## Remote Configuration Manager
-[https://github.com/vanvught/Remote-Config-UI/releases](https://github.com/vanvught/Remote-Config-UI/releases)<br>
-<img alt="GitHub release" src="https://img.shields.io/github/v/release/vanvught/Remote-Config-UI">
+## GD32 Firmware Update UI
+[https://github.com/vanvught/GD32F-Firmware-Update-UI/releases](https://github.com/vanvught/GD32F-Firmware-Update-UI/releases)<br>
+<img alt="GitHub release" src="https://img.shields.io/github/v/release/vanvught/GD32F-Firmware-Update-UI">

@@ -2,7 +2,7 @@
  * @file main.cpp
  *
  */
-/* Copyright (C) 2022-2024 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2022-2025 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,273 +23,158 @@
  * THE SOFTWARE.
  */
 
+#pragma GCC push_options
+#pragma GCC optimize("O2")
+#pragma GCC optimize("no-tree-loop-distribute-patterns")
+#pragma GCC optimize("-fprefetch-loop-arrays")
+
 #include <cstdint>
-#include <cassert>
 
-#include "hardware.h"
+#include "gd32/hal.h"
+#include "gd32/hal_watchdog.h"
 #include "network.h"
-#include "networkconst.h"
-
-#include "net/apps/mdns.h"
-
-#if defined (ENABLE_NTP_CLIENT)
-# include "net/apps/ntpclient.h"
-#endif
-
 #include "displayudf.h"
-#include "displayudfparams.h"
-#include "displayhandler.h"
-
-#include "artnetnode.h"
-#include "artnetparams.h"
-#include "artnetmsgconst.h"
+#include "json/displayudfparams.h"
+#include "dmxnodenode.h"
+#include "dmxnodemsgconst.h"
 #include "artnettriggerhandler.h"
-
-#include "pixeldmxconfiguration.h"
+#include "common/utils/utils_flags.h"
+#include "firmware/pixeldmx/show.h"
 #include "pixeltype.h"
 #include "pixeltestpattern.h"
-#include "pixeldmxparams.h"
-
-#include "ws28xxmulti.h"
-#include "ws28xxdmxmulti.h"
-
-#include "dmxparams.h"
+#include "json/pixeldmxparams.h"
+#include "pixeldmxmulti.h"
+#include "json/dmxsendparams.h"
 #include "dmxsend.h"
-#include "dmxconfigudp.h"
-
-#include "lightsetwith4.h"
-
-#if defined (NODE_RDMNET_LLRP_ONLY)
-# include "rdmdeviceparams.h"
-# include "rdmnetdevice.h"
-# include "rdmnetconst.h"
-# include "rdmpersonality.h"
-# include "rdm_e120.h"
+#include "dmxnodewith4.h"
+#if defined(NODE_RDMNET_LLRP_ONLY)
+#include "rdmnetdevice.h"
+#include "rdmdevice.h"
 #endif
-
-#if defined (NODE_SHOWFILE)
-# include "showfile.h"
-# include "showfileparams.h"
+#if defined(NODE_SHOWFILE)
+#include "showfile.h"
 #endif
-
 #include "remoteconfig.h"
-#include "remoteconfigparams.h"
-
 #include "configstore.h"
-
 #include "firmwareversion.h"
 #include "software_version.h"
+#include "software_version_id.h"
 
-namespace artnetnode {
-namespace configstore {
-uint32_t DMXPORT_OFFSET = 64;
-}  // namespace configstore
-}  // namespace artnetnode
-
-void Hardware::RebootHandler() {
-	WS28xxMulti::Get()->Blackout();
-	Dmx::Get()->Blackout();
-	ArtNetNode::Get()->Stop();
+namespace hal
+{
+void RebootHandler()
+{
+    PixelDmxMulti::Get().Blackout();
+    Dmx::Get()->Blackout();
+    ArtNetNode::Get()->Stop();
 }
+} // namespace hal
 
-int main() {
-	Hardware hw;
-	DisplayUdf display;
-	ConfigStore configStore;
-	display.TextStatus(NetworkConst::MSG_NETWORK_INIT, CONSOLE_YELLOW);
-	Network nw;
-	MDNS mDns;
-	display.TextStatus(NetworkConst::MSG_NETWORK_STARTED, CONSOLE_GREEN);
-	FirmwareVersion fw(SOFTWARE_VERSION, __DATE__, __TIME__);
+int main() // NOLINT
+{
+    hal::Init();
+    DisplayUdf display;
+    ConfigStore config_store;
+    network::Init();
+    FirmwareVersion fw(SOFTWARE_VERSION, __DATE__, __TIME__, DEVICE_SOFTWARE_VERSION_ID);
 
-	fw.Print("Art-Net 4 Pixel controller {16x 4 Universes} / 2x DMX");
+    fw.Print("Art-Net 4 Pixel controller {" STR(CONFIG_DMXNODE_PIXEL_MAX_PORTS) " Ports / 2x DMX}");
 
-#if defined (ENABLE_NTP_CLIENT)
-	NtpClient ntpClient;
-	ntpClient.Start();
-	ntpClient.Print();
+    DmxNodeNode dmxnode_node;
+
+    // Pixel - 64 Universes
+    PixelDmxMulti pixeldmx_multi;
+
+    json::PixelDmxParams pixeldmx_params;
+    pixeldmx_params.Load();
+    pixeldmx_params.Set();
+
+    const auto kPixelActivePorts = pixeldmx_multi.GetOutputPorts();
+    const auto kTestPattern = common::FromValue<pixelpatterns::Pattern>(ConfigStore::Instance().DmxLedGet(&common::store::DmxLed::test_pattern));
+
+    PixelTestPattern pixeltest_pattern(kTestPattern, kPixelActivePorts);
+
+    // DMX - 2 Universes
+    Dmx dmx;
+
+    json::DmxSendParams dmxparams;
+    dmxparams.Load();
+    dmxparams.Set();
+
+    uint32_t dmx_universes = 0;
+
+    for (uint32_t port_index = dmxnode::kDmxportOffset; port_index < dmxnode::kMaxPorts; port_index++)
+    {
+        const auto kDmxPortIndex = port_index - dmxnode::kDmxportOffset;
+
+        if (dmxnode_node.GetPortDirection(port_index) == dmxnode::PortDirection::kOutput)
+        {
+            dmx.SetPortDirection(kDmxPortIndex, dmx::PortDirection::kOutput, false);
+            dmx_universes++;
+        }
+    }
+
+    DmxSend dmx_send;
+
+    // DmxNodeWith4
+
+    DmxNodeWith4<CONFIG_DMXNODE_DMX_PORT_OFFSET> dmxNode((PixelTestPattern::Get()->GetPattern() != pixelpatterns::Pattern::kNone) ? nullptr : &pixeldmx_multi, (dmx_universes != 0) ? &dmx_send : nullptr);
+    dmxNode.Print();
+
+    ArtNetTriggerHandler triggerHandler(&dmxNode, &pixeldmx_multi);
+
+    dmxnode_node.SetOutput(&dmxNode);
+
+#if defined(NODE_RDMNET_LLRP_ONLY)
+    auto& rdm_device = RdmDevice::Get();
+    rdm_device.SetProductCategory(E120_PRODUCT_CATEGORY_FIXTURE);
+    rdm_device.SetProductDetail(E120_PRODUCT_DETAIL_LED);
+    rdm_device.Init();
+    rdm_device.Print();
+
+    RDMNetDevice llrp_only_device;
+
+    dmxnode_node.SetRdmUID(rdm_device.GetUID(), true);
 #endif
 
-	ArtNetNode node;
-
-	ArtNetParams artnetParams;
-	artnetParams.Load();
-	artnetParams.Set();
-
-	// LightSet A - Pixel - 64 Universes
-
-	PixelDmxConfiguration pixelDmxConfiguration;
-
-	PixelDmxParams pixelDmxParams;
-	pixelDmxParams.Load();
-	pixelDmxParams.Set();
-
-	WS28xxDmxMulti pixelDmxMulti;
-
-	const auto nPixelActivePorts = pixelDmxConfiguration.GetOutputPorts();
-	const auto nUniverses = pixelDmxConfiguration.GetUniverses();
-
-	uint32_t nPortProtocolIndex = 0;
-
-	for (uint32_t nOutportIndex = 0; nOutportIndex < nPixelActivePorts; nOutportIndex++) {
-		auto isSet = false;
-		const auto nStartUniversePort = pixelDmxParams.GetStartUniversePort(nOutportIndex, isSet);
-		for (uint32_t u = 0; u < nUniverses; u++) {
-			if (isSet) {
-				node.SetUniverse(nPortProtocolIndex, lightset::PortDir::OUTPUT, static_cast<uint16_t>(nStartUniversePort + u));
-				char label[artnet::SHORT_NAME_LENGTH];
-				snprintf(label, artnet::SHORT_NAME_LENGTH - 1, "Pixel %c U:%u", 'A' + nOutportIndex, nStartUniversePort + u);
-				node.SetShortName(nPortProtocolIndex, label);
-			}
-			nPortProtocolIndex++;
-		}
-	}
-
-	const auto nTestPattern = static_cast<pixelpatterns::Pattern>(pixelDmxParams.GetTestPattern());
-	PixelTestPattern pixelTestPattern(nTestPattern, nPixelActivePorts);
-
-	// LightSet B - DMX - 2 Universes
-
-	uint32_t nDmxUniverses = 0;
-
-	for (uint32_t nPortIndex = artnetnode::configstore::DMXPORT_OFFSET; nPortIndex < artnetnode::MAX_PORTS; nPortIndex++) {
-		const auto nDmxPortIndex = nPortIndex - artnetnode::configstore::DMXPORT_OFFSET;
-
-		if (artnetParams.GetDirection(nDmxPortIndex) == lightset::PortDir::OUTPUT) {
-			const auto Universe = artnetParams.GetUniverse(nDmxPortIndex);
-			node.SetUniverse(nPortIndex, lightset::PortDir::OUTPUT, Universe);
-			nDmxUniverses++;
-		}
-	}
-
-	Dmx dmx;
-
-	DmxParams dmxparams;
-	dmxparams.Load();
-	dmxparams.Set(&dmx);
-
-	for (uint32_t nPortIndex = artnetnode::configstore::DMXPORT_OFFSET; nPortIndex < artnetnode::MAX_PORTS; nPortIndex++) {
-		const auto nDmxPortIndex = nPortIndex - artnetnode::configstore::DMXPORT_OFFSET;
-
-		if (node.GetPortDirection(nPortIndex) == lightset::PortDir::OUTPUT) {
-			dmx.SetPortDirection(nDmxPortIndex, dmx::PortDirection::OUTP, false);
-		}
-	}
-
-	DmxSend dmxSend;
-	dmxSend.Print();
-
-	display.SetDmxInfo(displayudf::dmx::PortDir::OUTPUT, nDmxUniverses);
-
-	// LightSet 64with4
-
-	LightSetWith4<64> lightSet((PixelTestPattern::Get()->GetPattern() != pixelpatterns::Pattern::NONE) ? nullptr : &pixelDmxMulti, (nDmxUniverses != 0) ? &dmxSend : nullptr);
-	lightSet.Print();
-
-	ArtNetTriggerHandler triggerHandler(&lightSet, &pixelDmxMulti);
-
-	node.SetOutput(&lightSet);
-
-#if defined (NODE_RDMNET_LLRP_ONLY)
-	display.TextStatus(RDMNetConst::MSG_CONFIG, CONSOLE_YELLOW);
-
-	char aDescription[rdm::personality::DESCRIPTION_MAX_LENGTH + 1];
-	snprintf(aDescription, sizeof(aDescription) - 1, "Art-Net 4 P:%u-%s:%d D:%u", nPixelActivePorts, pixel::pixel_get_type(pixelDmxConfiguration.GetType()), pixelDmxConfiguration.GetCount(), nDmxUniverses);
-
-	char aLabel[RDM_DEVICE_LABEL_MAX_LENGTH + 1];
-	const auto nLength = snprintf(aLabel, sizeof(aLabel) - 1, GD32_BOARD_NAME " Pixel-DMX");
-
-	RDMPersonality *pPersonalities[1] = { new RDMPersonality(aDescription, nullptr) };
-	RDMNetDevice llrpOnlyDevice(pPersonalities, 1);
-
-	llrpOnlyDevice.SetLabel(RDM_ROOT_DEVICE, aLabel, static_cast<uint8_t>(nLength));
-	llrpOnlyDevice.SetProductCategory(E120_PRODUCT_CATEGORY_FIXTURE);
-	llrpOnlyDevice.SetProductDetail(E120_PRODUCT_DETAIL_LED);
-
-	node.SetRdmUID(llrpOnlyDevice.GetUID(), true);
-
-	llrpOnlyDevice.Init();
-
-	RDMDeviceParams rdmDeviceParams;
-
-	rdmDeviceParams.Load();
-	rdmDeviceParams.Set(&llrpOnlyDevice);
-
-	llrpOnlyDevice.Print();
+#if defined(NODE_SHOWFILE)
+    ShowFile showfile;
+    showfile.Print();
 #endif
 
-#if defined (NODE_SHOWFILE)
-	ShowFile showFile;
+    dmxnode_node.Print();
 
-	ShowFileParams showFileParams;
-	showFileParams.Load();
-	showFileParams.Set();
+    display.SetTitle("ArtNet 4 Pixel %ux%u", kPixelActivePorts, pixeldmx_multi.GetCount());
+    display.Set(2, displayudf::Labels::kVersion);
+    display.Set(3, displayudf::Labels::kIp);
+    display.Set(4, displayudf::Labels::kDefaultGateway);
+    display.Set(5, displayudf::Labels::kHostname);
 
-	showFile.Print();
+    json::DisplayUdfParams displayudf_params;
+    displayudf_params.Load();
+    displayudf_params.SetAndShow();
+
+    common::firmware::pixeldmx::Show(7);
+
+    RemoteConfig remote_config(remoteconfig::Output::PIXEL, dmxnode_node.GetActiveOutputPorts());
+
+    display.TextStatus(DmxNodeMsgConst::START, console::Colours::kConsoleYellow);
+
+    dmxnode_node.Start();
+
+    display.TextStatus(DmxNodeMsgConst::STARTED, console::Colours::kConsoleGreen);
+
+    hal::WatchdogInit();
+
+    for (;;)
+    {
+        hal::WatchdogFeed();
+        network::Run();
+        dmxnode_node.Run();
+#if defined(NODE_SHOWFILE)
+        showfile.Run();
 #endif
-
-	node.Print();
-
-	display.SetTitle("ArtNet 4 Pixel %ux%u", nPixelActivePorts, pixelDmxConfiguration.GetCount());
-	display.Set(2, displayudf::Labels::IP);
-	display.Set(3, displayudf::Labels::VERSION);
-	display.Set(4, displayudf::Labels::UNIVERSE_PORT_A);
-	display.Set(5, displayudf::Labels::DMX_DIRECTION);
-
-	DisplayUdfParams displayUdfParams;
-
-	displayUdfParams.Load();
-	displayUdfParams.Set(&display);
-
-	display.Show();
-	display.Printf(7, "%s:%d G%d %s",
-		pixel::pixel_get_type(pixelDmxConfiguration.GetType()),
-		pixelDmxConfiguration.GetCount(),
-		pixelDmxConfiguration.GetGroupingCount(),
-		pixel::pixel_get_map(pixelDmxConfiguration.GetMap()));
-
-	if (nTestPattern != pixelpatterns::Pattern::NONE) {
-		display.ClearLine(6);
-		display.Printf(6, "%s:%u", PixelPatterns::GetName(nTestPattern), static_cast<uint32_t>(nTestPattern));
-	}
-
-	RemoteConfig remoteConfig(remoteconfig::Node::ARTNET, remoteconfig::Output::PIXEL, node.GetActiveOutputPorts());
-
-	RemoteConfigParams remoteConfigParams;
-	remoteConfigParams.Load();
-	remoteConfigParams.Set(&remoteConfig);
-
-	while (configStore.Flash())
-		;
-
-	mDns.Print();
-
-	display.TextStatus(ArtNetMsgConst::START, CONSOLE_YELLOW);
-
-	node.Start();
-
-	display.TextStatus(ArtNetMsgConst::STARTED, CONSOLE_GREEN);
-
-	hw.WatchdogInit();
-
-	for (;;) {
-		hw.WatchdogFeed();
-		nw.Run();
-		node.Run();
-#if defined (NODE_SHOWFILE)
-		showFile.Run();
-#endif
-		remoteConfig.Run();
-		configStore.Flash();
-		pixelTestPattern.Run();
-		mDns.Run();
-#if defined (ENABLE_NTP_CLIENT)
-		ntpClient.Run();
-#endif
-#if defined (NODE_RDMNET_LLRP_ONLY)
-		llrpOnlyDevice.Run();
-#endif
-		display.Run();
-		hw.Run();
-	}
+        pixeltest_pattern.Run();
+        hal::Run();
+    }
 }

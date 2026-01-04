@@ -37,7 +37,6 @@ OF SUCH DAMAGE.
 
 #include "usbd_core.h"
 #include "usbd_conf.h"
-#include <wchar.h>
 
 #ifndef NULL
     #define NULL                0U

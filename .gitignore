@@ -56,3 +56,4 @@ udp_send
 *.map
 *.size
 /gd32_emac_debug
+/.cache
