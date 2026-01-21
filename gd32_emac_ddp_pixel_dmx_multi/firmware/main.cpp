@@ -31,7 +31,7 @@
 
 #include "gd32/hal_watchdog.h"
 #include "network.h"
-#include "net/apps/mdns.h"
+#include "apps/mdns.h"
 #include "displayudf.h"
 #include "json/displayudfparams.h"
 #include "ddpdisplay.h"
@@ -75,7 +75,7 @@ int main() // NOLINT
 
     fw.Print("DDP Pixel controller {16x 4 Universes} / 2x DMX");
 
-    mdns::ServiceRecordAdd(nullptr, mdns::Services::DDP, "type=display");
+    network::apps::mdns::ServiceRecordAdd(nullptr, network::apps::mdns::Services::kDdp, "type=display");
 
     DdpDisplay ddpdisplay;
 
