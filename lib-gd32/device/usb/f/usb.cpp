@@ -2,7 +2,7 @@
  * @file usb.cpp
  *
  */
-/* Copyright (C) 2023-2025 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2023-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,37 +45,40 @@ void UsbRcuConfig()
 #if !defined(GD32F4XX)
 #if defined(GD32F30X)
     DEBUG_ENTRY();
-    uint32_t system_clock = rcu_clock_freq_get(CK_SYS);
-    DEBUG_PRINTF("system_clock=%u", system_clock);
+
+    uint32_t kSystemClock = rcu_clock_freq_get(CK_SYS);
 
     // enable USB pull-up pin clock
     rcu_periph_clock_enable(RCU_AHBPeriph_GPIO_PULLUP);
 
-    if (48000000U == system_clock)
+    if (48000000U == kSystemClock)
     {
         rcu_usb_clock_config(RCU_CKUSB_CKPLL_DIV1);
     }
-    else if (72000000U == system_clock)
+    else if (72000000U == kSystemClock)
     {
         rcu_usb_clock_config(RCU_CKUSB_CKPLL_DIV1_5);
     }
-    else if (96000000U == system_clock)
+    else if (96000000U == kSystemClock)
     {
         rcu_usb_clock_config(RCU_CKUSB_CKPLL_DIV2);
     }
-    else if (120000000U == system_clock)
+    else if (120000000U == kSystemClock)
     {
         rcu_usb_clock_config(RCU_CKUSB_CKPLL_DIV2_5);
     }
     else
     {
-        assert(0);
+        assert(false && "Invalid kSystemClock");
     }
 
     // enable USB APB1 clock
     rcu_periph_clock_enable(RCU_USBD);
+
     DEBUG_EXIT();
 #else
+    DEBUG_ENTRY();
+
     const auto kSystemClock = rcu_clock_freq_get(CK_SYS);
     uint32_t usbfs_prescaler = 0U;
 
@@ -97,18 +100,20 @@ void UsbRcuConfig()
     }
     else
     {
-        assert(0);
+        assert(false && "Invalid kSystemClock");
     }
 
     rcu_usbfs_trng_clock_config(usbfs_prescaler);
     rcu_periph_clock_enable(RCU_USBFS);
+
+    DEBUG_EXIT();
 #endif
 #else
     DEBUG_ENTRY();
-    /* configure the PLLSAIP = 48MHz, PLLSAI_N = 288, PLLSAI_P = 6, PLLSAI_R = 2
-     */
+
+    // configure the PLLSAIP = 48MHz, PLLSAI_N = 288, PLLSAI_P = 6, PLLSAI_R = 2
     rcu_pllsai_config(288U, 6U, 2U);
-    /* enable PLLSAI */
+    // enable PLLSAI
     RCU_CTL |= RCU_CTL_PLLSAIEN;
     /* wait until PLLSAI is stable */
     while (0U == (RCU_CTL & RCU_CTL_PLLSAISTB))
@@ -119,6 +124,7 @@ void UsbRcuConfig()
     rcu_ck48m_clock_config(RCU_CK48MSRC_PLL48M);
 
     rcu_periph_clock_enable(RCU_USBFS);
+
     DEBUG_EXIT();
 #endif
 }
@@ -171,15 +177,21 @@ void UsbIntrConfig()
 {
 #if defined(GD32F30X)
     DEBUG_ENTRY();
-    /* 2 bits for preemption priority, 2 bits for subpriority */
+
+    // 2 bits for preemption priority, 2 bits for subpriority
     nvic_priority_group_set(NVIC_PRIGROUP_PRE2_SUB2);
-    /* enable the USB low priority interrupt */
+    // enable the USB low priority interrupt
     nvic_irq_enable(static_cast<uint8_t>(USBD_LP_CAN0_RX0_IRQn), 2U, 0U);
-    /* enable the USB low priority interrupt */
+    // enable the USB low priority interrupt
     nvic_irq_enable(static_cast<uint8_t>(USBD_HP_CAN0_TX_IRQn), 1U, 0U);
+
     DEBUG_ENTRY();
 #else
+    DEBUG_ENTRY();
+
     nvic_priority_group_set(NVIC_PRIGROUP_PRE2_SUB2);
     nvic_irq_enable(static_cast<uint8_t>(USBFS_IRQn), 2U, 0U);
+
+    DEBUG_ENTRY();
 #endif
 }
