@@ -59,3 +59,4 @@ udp_send
 /.cache
 *.pyc
 /common/scripts/gd32/venv
+software_version_id.h
