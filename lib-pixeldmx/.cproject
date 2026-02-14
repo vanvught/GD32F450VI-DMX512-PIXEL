@@ -186,7 +186,8 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="src|src/params|src/rdm|src/dmx|src/dmxmulti" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry excluding="pixeldmxmulti|pixeldmxrdm|dmx|dmxmulti|pixeldmxparams|pixeldmx" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="json|pixeldmxparams|pixeldmxrdm" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/json"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/pixeldmxparams"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src/pixeldmxrdm"/>
 					</sourceEntries>
@@ -423,7 +424,13 @@
 		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.toolchain.base.340154491;ilg.gnuarmeclipse.managedbuild.cross.toolchain.base.340154491.1878029783;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.703017670;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.1199958191">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.toolchain.base.309283989.303033930.1702909156.1968016134.1348187898.727602372;ilg.gnuarmeclipse.managedbuild.cross.toolchain.base.309283989.303033930.1702909156.1968016134.1348187898.727602372.;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.401029714;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input.1282139567">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.1590148146.326788571.930754099.1955662857.1608097441;cdt.managedbuild.toolchain.gnu.cross.base.1590148146.326788571.930754099.1955662857.1608097441.;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.2103159868;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.1209690535">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.toolchain.base.309283989.303033930.1702909156.1968016134.1348187898.727602372;ilg.gnuarmeclipse.managedbuild.cross.toolchain.base.309283989.303033930.1702909156.1968016134.1348187898.727602372.;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.417877590;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.411175278">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.toolchain.base.340154491;ilg.gnuarmeclipse.managedbuild.cross.toolchain.base.340154491.1878029783;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.1944577566;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input.1060841615">

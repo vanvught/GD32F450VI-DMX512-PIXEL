@@ -57,3 +57,5 @@ udp_send
 *.size
 /gd32_emac_debug
 /.cache
+*.pyc
+/common/scripts/gd32/venv
