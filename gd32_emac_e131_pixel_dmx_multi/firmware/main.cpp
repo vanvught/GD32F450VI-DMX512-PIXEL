@@ -48,8 +48,6 @@
 #include "dmxnodewith4.h"
 #if defined(NODE_RDMNET_LLRP_ONLY)
 #include "rdmnetdevice.h"
-#include "rdmdevice.h"
-#include "rdm_e120.h"
 #endif
 #if defined(NODE_SHOWFILE)
 #include "showfile.h"
@@ -58,7 +56,6 @@
 #include "configstore.h"
 #include "firmwareversion.h"
 #include "software_version.h"
-#include "software_version_id.h"
 
 namespace hal
 {
@@ -76,7 +73,7 @@ int main() // NOLINT
     DisplayUdf display;
     ConfigStore config_store;
     network::Init();
-    FirmwareVersion fw(SOFTWARE_VERSION, __DATE__, __TIME__, DEVICE_SOFTWARE_VERSION_ID);
+    FirmwareVersion fw(SOFTWARE_VERSION, __DATE__, __TIME__);
 
     fw.Print("sACN Pixel controller {" STR(CONFIG_DMXNODE_PIXEL_MAX_PORTS) " Ports / 2x DMX}");
 
@@ -125,13 +122,8 @@ int main() // NOLINT
     dmxnode_node.SetOutput(&dmxNodeWith4);
 
 #if defined(NODE_RDMNET_LLRP_ONLY)
-    auto& rdm_device = RdmDevice::Get();
-    rdm_device.SetProductCategory(E120_PRODUCT_CATEGORY_FIXTURE);
-    rdm_device.SetProductDetail(E120_PRODUCT_DETAIL_LED);
-    rdm_device.Init();
-    rdm_device.Print();
-
     RDMNetDevice llrp_only_device;
+    llrp_only_device.Print();
 #endif
 
 #if defined(NODE_SHOWFILE)
