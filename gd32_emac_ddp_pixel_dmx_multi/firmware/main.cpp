@@ -69,7 +69,7 @@ int main() // NOLINT
     DisplayUdf display;
     ConfigStore config_store;
     network::Init();
-    FirmwareVersion fw(SOFTWARE_VERSION, __DATE__, __TIME__);
+    FirmwareVersion fw(kSoftwareVersion, __DATE__, __TIME__);
 
     fw.Print("DDP Pixel controller {16x 4 Universes} / 2x DMX");
 
