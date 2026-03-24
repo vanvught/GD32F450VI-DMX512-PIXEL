@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-#include "gd32.h" // DO NOT REMOVE 
+#include "gd32.h" // IWYU pragma: keep // DO NOT REMOVE 
 #include "device/usb.h"
 
 extern "C"
@@ -38,7 +38,7 @@ extern usb_core_driver usbh_core;
 usbh_host usb_host;
 #else
 usb_core_driver usbh_core;
-usbh_host usb_host_msc;
+usbh_host usb_host;
 #endif
 extern usbh_user_cb usr_cb;
 
@@ -51,8 +51,8 @@ void usb_init()
     usbh_class_register(&usb_host, &usbh_msc);
     usbh_init(&usb_host, &usr_cb);
 #else
-    usbh_class_register(&usb_host_msc, &usbh_msc);
-    usbh_init(&usb_host_msc, &usbh_core, USB_CORE_ENUM_FS, &usr_cb);
+    usbh_class_register(&usb_host, &usbh_msc);
+    usbh_init(&usb_host, &usbh_core, USB_CORE_ENUM_FS, &usr_cb);
 #endif
 
     UsbIntrConfig();

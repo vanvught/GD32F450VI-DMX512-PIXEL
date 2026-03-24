@@ -174,7 +174,7 @@ void pllusb_rcu_config(uint32_t usb_periph) {
 }
 
 usb_core_driver usbh_core;
-usbh_host usb_host_msc;
+usbh_host usb_host;
 
 extern usbh_user_cb usr_cb;
 

@@ -2,7 +2,7 @@
  * @file usb_host_msc.h
  *
  */
-/* Copyright (C) 2023-2025 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2023-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,44 +29,44 @@
 #include <cstdint>
 
 #include "usbh_core.h"
-#include "usb_conf.h"
+#include "usb_conf.h" // IWYU pragma: keep
 
 /* function declarations */
 /* user operation for host-mode initialization */
-void usbh_user_init();
+void usbh_user_init(); // NOLINT
 /* deinitialize user state and associated variables */
-void usbh_user_deinit();
+void usbh_user_deinit(); // NOLINT
 /* user operation for device attached */
-void usbh_user_device_connected();
+void usbh_user_device_connected(); // NOLINT
 /* user operation for reset USB Device */
-void usbh_user_device_reset();
+void usbh_user_device_reset(); // NOLINT
 /* user operation for device disconnect event */
-void usbh_user_device_disconnected();
+void usbh_user_device_disconnected(); // NOLINT
 /* user operation for device over current detection event */
-void usbh_user_over_current_detected();
+void usbh_user_over_current_detected(); // NOLINT
 /* user operation for detecting device speed */
-void usbh_user_device_speed_detected(uint32_t device_speed);
+void usbh_user_device_speed_detected(uint32_t device_speed); // NOLINT
 /* user operation when device descriptor is available */
-void usbh_user_device_desc_available(void*);
+void usbh_user_device_desc_available(void*); // NOLINT
 /* usb device is successfully assigned the address  */
-void usbh_user_device_address_assigned();
+void usbh_user_device_address_assigned(); // NOLINT
 /* user operation when configuration descriptor is available */
-void usbh_user_configuration_descavailable(usb_desc_config* cfg_desc, usb_desc_itf* itf_desc, usb_desc_ep* ep_desc);
+void usbh_user_configuration_descavailable(usb_desc_config* cfg_desc, usb_desc_itf* itf_desc, usb_desc_ep* ep_desc); // NOLINT
 /* user operation when manufacturer string exists */
-void usbh_user_manufacturer_string(void*);
+void usbh_user_manufacturer_string(void*); // NOLINT
 /* user operation when product string exists */
-void usbh_user_product_string(void*);
+void usbh_user_product_string(void*); // NOLINT
 /* user operation when serialNum string exists */
-void usbh_user_serialnum_string(void*);
+void usbh_user_serialnum_string(void*); // NOLINT
 /* user response request is displayed to ask for application jump to class */
-void usbh_user_enumeration_finish();
+void usbh_user_enumeration_finish(); // NOLINT
 /* user action for application state entry */
-usbh_user_status usbh_user_userinput();
+usbh_user_status usbh_user_userinput(); // NOLINT
 /* user operation when device is not supported */
-void usbh_user_device_not_supported();
+void usbh_user_device_not_supported(); // NOLINT
 /* user operation when unrecovered error happens */
-void usbh_user_unrecovered_error();
+void usbh_user_unrecovered_error(); // NOLINT
 /* demo application for mass storage */
-int usbh_usr_msc_application();
+int usbh_usr_msc_application(); // NOLINT
 
 #endif // USB_HOST_MSC_USB_HOST_MSC_H_
