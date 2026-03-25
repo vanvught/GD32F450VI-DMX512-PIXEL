@@ -60,3 +60,4 @@ udp_send
 *.pyc
 /common/scripts/gd32/venv
 software_version_id.h
+/lib-gd32/device/usb/h
