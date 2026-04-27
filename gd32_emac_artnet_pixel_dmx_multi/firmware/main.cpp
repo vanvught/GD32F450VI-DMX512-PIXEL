@@ -26,7 +26,6 @@
 #pragma GCC push_options
 #pragma GCC optimize("O2")
 #pragma GCC optimize("no-tree-loop-distribute-patterns")
-#pragma GCC optimize("-fprefetch-loop-arrays")
 
 #include <cstdint>
 
@@ -55,11 +54,8 @@
 #include "firmwareversion.h"
 #include "software_version.h"
 
-
-namespace hal
-{
-void RebootHandler()
-{
+namespace hal {
+void RebootHandler() {
     PixelDmxMulti::Get().Blackout();
     Dmx::Get()->Blackout();
     ArtNetNode::Get()->Stop();
@@ -99,12 +95,10 @@ int main() // NOLINT
 
     uint32_t dmx_universes = 0;
 
-    for (uint32_t port_index = dmxnode::kDmxportOffset; port_index < dmxnode::kMaxPorts; port_index++)
-    {
+    for (uint32_t port_index = dmxnode::kDmxportOffset; port_index < dmxnode::kMaxPorts; port_index++) {
         const auto kDmxPortIndex = port_index - dmxnode::kDmxportOffset;
 
-        if (dmxnode_node.GetPortDirection(port_index) == dmxnode::PortDirection::kOutput)
-        {
+        if (dmxnode_node.GetPortDirection(port_index) == dmxnode::PortDirection::kOutput) {
             dmx.SetPortDirection(kDmxPortIndex, dmx::PortDirection::kOutput, false);
             dmx_universes++;
         }
@@ -150,8 +144,7 @@ int main() // NOLINT
 
     hal::WatchdogInit();
 
-    for (;;)
-    {
+    for (;;) {
         hal::WatchdogFeed();
         network::Run();
         dmxnode_node.Run();

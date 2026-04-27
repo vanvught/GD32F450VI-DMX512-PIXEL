@@ -2,7 +2,7 @@
  * @file main.cpp
  *
  */
-/* Copyright (C) 2022-2025 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2022-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,6 @@
 #pragma GCC push_options
 #pragma GCC optimize("O2")
 #pragma GCC optimize("no-tree-loop-distribute-patterns")
-#pragma GCC optimize("-fprefetch-loop-arrays")
 
 #include <cstdint>
 
@@ -46,9 +45,6 @@
 #include "json/dmxsendparams.h"
 #include "dmxsend.h"
 #include "dmxnodewith4.h"
-#if defined(NODE_RDMNET_LLRP_ONLY)
-#include "rdmnetdevice.h"
-#endif
 #if defined(NODE_SHOWFILE)
 #include "showfile.h"
 #endif
@@ -57,10 +53,8 @@
 #include "firmwareversion.h"
 #include "software_version.h"
 
-namespace hal
-{
-void RebootHandler()
-{
+namespace hal {
+void RebootHandler() {
     PixelDmxMulti::Get().Blackout();
     Dmx::Get()->Blackout();
     E131Bridge::Get()->Stop();
@@ -101,12 +95,10 @@ int main() // NOLINT
 
     uint32_t dmx_universes = 0;
 
-    for (uint32_t port_index = dmxnode::kDmxportOffset; port_index < dmxnode::kMaxPorts; port_index++)
-    {
+    for (uint32_t port_index = dmxnode::kDmxportOffset; port_index < dmxnode::kMaxPorts; port_index++) {
         const auto kDmxPortIndex = port_index - dmxnode::kDmxportOffset;
 
-        if (dmxnode_node.GetPortDirection(port_index) == dmxnode::PortDirection::kOutput)
-        {
+        if (dmxnode_node.GetPortDirection(port_index) == dmxnode::PortDirection::kOutput) {
             dmx.SetPortDirection(kDmxPortIndex, dmx::PortDirection::kOutput, false);
             dmx_universes++;
         }
@@ -120,11 +112,6 @@ int main() // NOLINT
     dmxNodeWith4.Print();
 
     dmxnode_node.SetOutput(&dmxNodeWith4);
-
-#if defined(NODE_RDMNET_LLRP_ONLY)
-    RDMNetDevice llrp_only_device;
-    llrp_only_device.Print();
-#endif
 
 #if defined(NODE_SHOWFILE)
     ShowFile showfile;
@@ -155,8 +142,7 @@ int main() // NOLINT
 
     hal::WatchdogInit();
 
-    for (;;)
-    {
+    for (;;) {
         hal::WatchdogFeed();
         network::Run();
         dmxnode_node.Run();
