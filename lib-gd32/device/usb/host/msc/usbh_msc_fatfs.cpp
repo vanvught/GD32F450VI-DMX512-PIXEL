@@ -24,10 +24,9 @@
  */
 
 #include <time.h>
- 
+
 #include "usb_conf.h" // IWYU pragma: keep
-extern "C"
-{
+extern "C" {
 #include "usbh_msc_core.h"
 }
 #include "ff.h"
@@ -37,176 +36,145 @@ static volatile DSTATUS state = STA_NOINIT;
 
 extern usbh_host usb_host;
 
-extern "C"
-{
-    DSTATUS disk_initialize(BYTE drv)
-    {
-        usb_core_driver* udev = (usb_core_driver*)usb_host.data;
+extern "C" {
+DSTATUS disk_initialize(BYTE drv) {
+    usb_core_driver* udev = (usb_core_driver*)usb_host.data;
 
-        if (udev->host.connect_status)
-        {
-            state &= ~STA_NOINIT;
-        }
-
-        return state;
+    if (udev->host.connect_status) {
+        state &= ~STA_NOINIT;
     }
 
-    DSTATUS disk_status(BYTE drv)
-    {
-        if (drv)
-        {
-            return STA_NOINIT; /* supports only single drive */
-        }
+    return state;
+}
 
-        return state;
+DSTATUS disk_status(BYTE drv) {
+    if (drv) {
+        return STA_NOINIT; /* supports only single drive */
     }
 
-    DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count)
-    {
-        BYTE status = USBH_OK;
-        usb_core_driver* udev = (usb_core_driver*)usb_host.data;
+    return state;
+}
 
-        if (drv || (!count))
-        {
-            return RES_PARERR;
-        }
+DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count) {
+    BYTE status = USBH_OK;
+    usb_core_driver* udev = (usb_core_driver*)usb_host.data;
 
-        if (state & STA_NOINIT)
-        {
-            return RES_NOTRDY;
-        }
-
-        if (udev->host.connect_status)
-        {
-            do
-            {
-                status = usbh_msc_read(&usb_host, drv, sector, buff, count);
-
-                if (!udev->host.connect_status)
-                {
-                    return RES_ERROR;
-                }
-            } while (status == USBH_BUSY);
-        }
-
-        if (status == USBH_OK)
-        {
-            return RES_OK;
-        }
-
-        return RES_ERROR;
+    if (drv || (!count)) {
+        return RES_PARERR;
     }
+
+    if (state & STA_NOINIT) {
+        return RES_NOTRDY;
+    }
+
+    if (udev->host.connect_status) {
+        do {
+            status = usbh_msc_read(&usb_host, drv, sector, buff, count);
+
+            if (!udev->host.connect_status) {
+                return RES_ERROR;
+            }
+        } while (status == USBH_BUSY);
+    }
+
+    if (status == USBH_OK) {
+        return RES_OK;
+    }
+
+    return RES_ERROR;
+}
 
 #ifdef CONFIG_FS_ENABLE_WRITE
-    DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count)
-    {
-        BYTE status = USBH_OK;
-        usb_core_driver* udev = (usb_core_driver*)usb_host.data;
+DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count) {
+    BYTE status = USBH_OK;
+    usb_core_driver* udev = (usb_core_driver*)usb_host.data;
 
-        if ((!count) || drv)
-        {
-            return RES_PARERR;
-        }
-
-        if (state & STA_NOINIT)
-        {
-            return RES_NOTRDY;
-        }
-
-        if (state & STA_PROTECT)
-        {
-            return RES_WRPRT;
-        }
-
-        if (udev->host.connect_status)
-        {
-            do
-            {
-                status = usbh_msc_write(&usb_host, drv, sector, reinterpret_cast<uint8_t*>(const_cast<BYTE*>(buff)), count);
-
-                if (!udev->host.connect_status)
-                {
-                    return RES_ERROR;
-                }
-            } while (status == USBH_BUSY);
-        }
-
-        if (status == USBH_OK)
-        {
-            return RES_OK;
-        }
-
-        return RES_ERROR;
+    if ((!count) || drv) {
+        return RES_PARERR;
     }
+
+    if (state & STA_NOINIT) {
+        return RES_NOTRDY;
+    }
+
+    if (state & STA_PROTECT) {
+        return RES_WRPRT;
+    }
+
+    if (udev->host.connect_status) {
+        do {
+            status = usbh_msc_write(&usb_host, drv, sector, reinterpret_cast<uint8_t*>(const_cast<BYTE*>(buff)), count);
+
+            if (!udev->host.connect_status) {
+                return RES_ERROR;
+            }
+        } while (status == USBH_BUSY);
+    }
+
+    if (status == USBH_OK) {
+        return RES_OK;
+    }
+
+    return RES_ERROR;
+}
 
 #endif /* CONFIG_FS_ENABLE_WRITE */
 
-    DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff)
-    {
-        DRESULT res = RES_OK;
-        msc_lun info;
+DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) {
+    DRESULT res = RES_OK;
+    msc_lun info;
 
-        if (drv)
-        {
-            return RES_PARERR;
-        }
+    if (drv) {
+        return RES_PARERR;
+    }
 
-        res = RES_ERROR;
+    res = RES_ERROR;
 
-        if (state & STA_NOINIT)
-        {
-            return RES_NOTRDY;
-        }
+    if (state & STA_NOINIT) {
+        return RES_NOTRDY;
+    }
 
-        switch (ctrl)
-        {
-            // make sure that no pending write process 
-            case CTRL_SYNC:
+    switch (ctrl) {
+        // make sure that no pending write process
+        case CTRL_SYNC:
+            res = RES_OK;
+            break;
+
+        // get number of sectors on the disk (dword)
+        case GET_SECTOR_COUNT:
+            if (USBH_OK == usbh_msc_lun_info_get(&usb_host, drv, &info)) {
+                *reinterpret_cast<DWORD*>(buff) = static_cast<DWORD>(info.capacity.block_nbr);
                 res = RES_OK;
-                break;
+            }
+            break;
 
-            // get number of sectors on the disk (dword)
-            case GET_SECTOR_COUNT:
-                if (USBH_OK == usbh_msc_lun_info_get(&usb_host, drv, &info))
-                {
-                    *reinterpret_cast<DWORD*>(buff) = static_cast<DWORD>(info.capacity.block_nbr);
-                    res = RES_OK;
-                }
-                break;
+        // get r/w sector size (word) */
+        case GET_SECTOR_SIZE:
+            if (USBH_OK == usbh_msc_lun_info_get(&usb_host, drv, &info)) {
+                *reinterpret_cast<WORD*>(buff) = static_cast<DWORD>(info.capacity.block_size);
+                res = RES_OK;
+            }
+            break;
 
-            // get r/w sector size (word) */
-            case GET_SECTOR_SIZE:
-                if (USBH_OK == usbh_msc_lun_info_get(&usb_host, drv, &info))
-                {
-                    *reinterpret_cast<WORD*>(buff) = static_cast<DWORD>(info.capacity.block_size);
-                    res = RES_OK;
-                }
-                break;
+        // get erase block size in unit of sector (dword)
+        case GET_BLOCK_SIZE:
+            *static_cast<DWORD*>(buff) = 512U;
+            break;
 
-            // get erase block size in unit of sector (dword)
-            case GET_BLOCK_SIZE:
-                *static_cast<DWORD*>(buff) = 512U;
-                break;
-
-            default:
-                res = RES_PARERR;
-                break;
-        }
-
-        return res;
+        default:
+            res = RES_PARERR;
+            break;
     }
 
-    DWORD get_fattime(void)
-    {
-      auto ltime = time(nullptr);
-      auto *local_time = localtime(&ltime);
-      auto packed_time = ((DWORD) (local_time->tm_year + 20) << 25)
-          | ((DWORD) (local_time->tm_mon + 1) << 21)
-          | ((DWORD) local_time->tm_mday << 16)
-          | ((DWORD) local_time->tm_hour << 11)
-          | ((DWORD) local_time->tm_min << 5)
-          | ((DWORD) local_time->tm_sec >> 1);
+    return res;
+}
 
-      return packed_time;
-    }
+DWORD get_fattime(void) {
+    auto ltime = time(nullptr);
+    auto* local_time = localtime(&ltime);
+    auto packed_time =
+        ((DWORD)(local_time->tm_year + 20) << 25) | ((DWORD)(local_time->tm_mon + 1) << 21) | ((DWORD)local_time->tm_mday << 16) | ((DWORD)local_time->tm_hour << 11) | ((DWORD)local_time->tm_min << 5) | ((DWORD)local_time->tm_sec >> 1);
+
+    return packed_time;
+}
 }

@@ -2,7 +2,7 @@
  * usb_vbus.cpp
  *
  */
-/* Copyright (C) 2023-2025 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2023-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,22 +26,18 @@
 #include <cstdio>
 #include <cstdint>
 
-#include "gd32.h"
+#include "gd32.h" // IWYU pragma: keep
 
-extern "C"
+extern "C" {
+void usb_vbus_drive(uint8_t state) // NOLINT
 {
-    void usb_vbus_drive(uint8_t state) //NOLINT
-    {
-        printf("usb_vbus_drive: %u\n", state);
+    printf("usb_vbus_drive: %u\n", state);
 #if defined(USB_HOST_VBUS_GPIOx)
-        if (0U == state)
-        {
-            gpio_bit_reset(USB_HOST_VBUS_GPIOx, USB_HOST_VBUS_GPIO_PINx);
-        }
-        else
-        {
-            gpio_bit_set(USB_HOST_VBUS_GPIOx, USB_HOST_VBUS_GPIO_PINx);
-        }
-#endif
+    if (0U == state) {
+        gpio_bit_reset(USB_HOST_VBUS_GPIOx, USB_HOST_VBUS_GPIO_PINx);
+    } else {
+        gpio_bit_set(USB_HOST_VBUS_GPIOx, USB_HOST_VBUS_GPIO_PINx);
     }
+#endif
+}
 }

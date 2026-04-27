@@ -2,7 +2,7 @@
  * usb_conf.h
  *
  */
-/* Copyright (C) 2023-2024 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2023-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,13 +28,13 @@
 
 #include <stdint.h>
 
-#include "gd32.h"
+#include "gd32.h" // IWYU pragma: keep
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wattributes"
 
-#if !defined (USE_USB_FS)
-# define USE_USB_FS
+#if !defined(USE_USB_FS)
+#define USE_USB_FS
 #endif
 #define USB_FS_CORE
 
@@ -55,47 +55,47 @@
  *        If there is at least one High Bandwidth Isochronous OUT endpoint,
  *        then the space must be at least two times the maximum packet size for
  *        that channel.
-*******************************************************************************/
+ *******************************************************************************/
 
-#define USB_RX_FIFO_FS_SIZE                            128
-#define USB_HTX_NPFIFO_FS_SIZE                         96
-#define USB_HTX_PFIFO_FS_SIZE                          96
+#define USB_RX_FIFO_FS_SIZE     128
+#define USB_HTX_NPFIFO_FS_SIZE  96
+#define USB_HTX_PFIFO_FS_SIZE   96
 
-#define USB_SOF_OUTPUT		0
-#define USB_LOW_POWER		0
+#define USB_SOF_OUTPUT          0
+#define USB_LOW_POWER           0
 
-#if defined (USB_FS_CORE)
-# define USBFS_SOF_OUTPUT	0
-# define USBFS_LOW_POWER	0
+#if defined(USB_FS_CORE)
+#define USBFS_SOF_OUTPUT        0
+#define USBFS_LOW_POWER         0
 #endif
 
 #define USE_HOST_MODE
 
 #ifndef USB_FS_CORE
-    #ifndef USB_HS_CORE
-        #error "USB_HS_CORE or USB_FS_CORE should be defined"
-    #endif
+#ifndef USB_HS_CORE
+#error "USB_HS_CORE or USB_FS_CORE should be defined"
+#endif
 #endif
 
 #ifndef USE_DEVICE_MODE
-    #ifndef USE_HOST_MODE
-        #error "USE_DEVICE_MODE or USE_HOST_MODE should be defined"
-    #endif
+#ifndef USE_HOST_MODE
+#error "USE_DEVICE_MODE or USE_HOST_MODE should be defined"
+#endif
 #endif
 
 #ifndef USE_USB_HS
-    #ifndef USE_USB_FS
-        #error "USE_USB_HS or USE_USB_FS should be defined"
-    #endif
+#ifndef USE_USB_FS
+#error "USE_USB_HS or USE_USB_FS should be defined"
+#endif
 #endif
 
 /* __packed keyword used to decrease the data type alignment to 1-byte */
-#if defined   ( __GNUC__ )   /* GNU Compiler */
-    #ifndef __packed
-        #define __packed __attribute__ ((__packed__))
-    #endif
-#elif defined   (__TASKING__)  /* TASKING Compiler */
-    #define __packed __unaligned
+#if defined(__GNUC__) /* GNU Compiler */
+#ifndef __packed
+#define __packed __attribute__((__packed__))
+#endif
+#elif defined(__TASKING__) /* TASKING Compiler */
+#define __packed __unaligned
 #endif /* __GNUC__ */
 
 #endif /* F_USB_CONF_H_ */

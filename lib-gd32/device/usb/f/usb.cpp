@@ -40,8 +40,7 @@
 void usb_mdelay(uint32_t);
 #endif
 
-void UsbRcuConfig()
-{
+void UsbRcuConfig() {
 #if !defined(GD32F4XX)
 #if defined(GD32F30X)
     DEBUG_ENTRY();
@@ -51,24 +50,15 @@ void UsbRcuConfig()
     // enable USB pull-up pin clock
     rcu_periph_clock_enable(RCU_AHBPeriph_GPIO_PULLUP);
 
-    if (48000000U == kSystemClock)
-    {
+    if (48000000U == kSystemClock) {
         rcu_usb_clock_config(RCU_CKUSB_CKPLL_DIV1);
-    }
-    else if (72000000U == kSystemClock)
-    {
+    } else if (72000000U == kSystemClock) {
         rcu_usb_clock_config(RCU_CKUSB_CKPLL_DIV1_5);
-    }
-    else if (96000000U == kSystemClock)
-    {
+    } else if (96000000U == kSystemClock) {
         rcu_usb_clock_config(RCU_CKUSB_CKPLL_DIV2);
-    }
-    else if (120000000U == kSystemClock)
-    {
+    } else if (120000000U == kSystemClock) {
         rcu_usb_clock_config(RCU_CKUSB_CKPLL_DIV2_5);
-    }
-    else
-    {
+    } else {
         assert(false && "Invalid kSystemClock");
     }
 
@@ -82,24 +72,15 @@ void UsbRcuConfig()
     const auto kSystemClock = rcu_clock_freq_get(CK_SYS);
     uint32_t usbfs_prescaler = 0U;
 
-    if (48000000U == kSystemClock)
-    {
+    if (48000000U == kSystemClock) {
         usbfs_prescaler = RCU_CKUSB_CKPLL_DIV1;
-    }
-    else if (72000000U == kSystemClock)
-    {
+    } else if (72000000U == kSystemClock) {
         usbfs_prescaler = RCU_CKUSB_CKPLL_DIV1_5;
-    }
-    else if (96000000U == kSystemClock)
-    {
+    } else if (96000000U == kSystemClock) {
         usbfs_prescaler = RCU_CKUSB_CKPLL_DIV2;
-    }
-    else if (120000000U == kSystemClock)
-    {
+    } else if (120000000U == kSystemClock) {
         usbfs_prescaler = RCU_CKUSB_CKPLL_DIV2_5;
-    }
-    else
-    {
+    } else {
         assert(false && "Invalid kSystemClock");
     }
 
@@ -116,8 +97,7 @@ void UsbRcuConfig()
     // enable PLLSAI
     RCU_CTL |= RCU_CTL_PLLSAIEN;
     /* wait until PLLSAI is stable */
-    while (0U == (RCU_CTL & RCU_CTL_PLLSAISTB))
-    {
+    while (0U == (RCU_CTL & RCU_CTL_PLLSAISTB)) {
     }
 
     rcu_pll48m_clock_config(RCU_PLL48MSRC_PLLSAIP);
@@ -129,8 +109,7 @@ void UsbRcuConfig()
 #endif
 }
 
-void UsbGpioConfig()
-{
+void UsbGpioConfig() {
 #if defined(GPIO_INIT)
 #if defined(GD32F30X)
     DEBUG_ENTRY();
@@ -155,8 +134,7 @@ void UsbGpioConfig()
 #endif
 }
 
-void UsbVbusConfig()
-{
+void UsbVbusConfig() {
 #if defined(USB_HOST_VBUS_GPIOx)
     rcu_periph_clock_enable(USB_HOST_VBUS_RCU_GPIOx);
 
@@ -173,8 +151,7 @@ void UsbVbusConfig()
 #endif
 }
 
-void UsbIntrConfig()
-{
+void UsbIntrConfig() {
 #if defined(GD32F30X)
     DEBUG_ENTRY();
 

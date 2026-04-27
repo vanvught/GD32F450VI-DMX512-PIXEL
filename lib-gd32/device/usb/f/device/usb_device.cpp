@@ -2,7 +2,7 @@
  * @file usb_device.cpp
  *
  */
-/* Copyright (C) 2025 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2025-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,17 +23,15 @@
  * THE SOFTWARE.
  */
 
-#include "gd32.h"
-#include "device/usb.h"
+#include "gd32.h"       // IWYU pragma: keep
+#include "device/usb.h" // IWYU pragma: keep
 #include "drv_usb_core.h"
-extern "C"
-{
+extern "C" {
 #include "drv_usbd_int.h"
 }
 
 #if defined(CONFIG_USB_DEVICE_CDC)
-extern "C"
-{
+extern "C" {
 #include "cdc_acm_core.h"
 }
 #endif
@@ -47,8 +45,7 @@ usb_core_driver cdc_acm;
 #endif
 
 #if defined(CONFIG_USB_DEVICE_CDC)
-void UsbInit()
-{
+void UsbInit() {
     UsbRcuConfig();
     UsbGpioConfig();
 
@@ -61,8 +58,7 @@ void UsbInit()
 
 extern usb_core_driver cdc_acm;
 
-extern "C" void USBFS_IRQHandler()
-{
+extern "C" void USBFS_IRQHandler() {
     usbd_isr(&cdc_acm);
 }
 #endif
