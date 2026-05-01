@@ -1,6 +1,3 @@
-#ifndef DMX_BOARD_GD32F450VI_H_
-#define DMX_BOARD_GD32F450VI_H_
-
 /**
  * @file board_gd32f450vi.h
  *
@@ -26,26 +23,30 @@
  * THE SOFTWARE.
  */
 
+#ifndef DMX_BOARD_GD32F450VI_H_
+#define DMX_BOARD_GD32F450VI_H_
+
 #include <cstdint>
-#include "gd32_board.h"
+
+#include "gd32.h" // IWYU pragma: keep
 
 #define DMX_MAX_PORTS 2
 
-namespace max
-{
-static constexpr uint32_t PORTS = DMX_MAX_PORTS;
+namespace dmx::config {
+namespace max {
+inline constexpr uint32_t kPorts = DMX_MAX_PORTS;
 } // namespace max
 
 #define DMX_USE_USART2
 #define DMX_USE_USART5
 
-static constexpr auto USART2_PORT = 0;
-static constexpr auto USART5_PORT = 1;
+inline constexpr auto USART2_PORT = 0;
+inline constexpr auto USART5_PORT = 1;
 
-static constexpr auto DIR_PORT_0_GPIO_PORT = GPIOD;
-static constexpr auto DIR_PORT_0_GPIO_PIN = GPIO_PIN_0; ///< Not used
+inline constexpr auto DIR_PORT_0_GPIO_PORT = GPIOD;
+inline constexpr auto DIR_PORT_0_GPIO_PIN = GPIO_PIN_0; ///< Not used
 
-static constexpr auto DIR_PORT_1_GPIO_PORT = GPIOD;
-static constexpr auto DIR_PORT_1_GPIO_PIN = GPIO_PIN_1; ///< Not used
-
-#endif  // DMX_BOARD_GD32F450VI_H_
+inline constexpr auto DIR_PORT_1_GPIO_PORT = GPIOD;
+inline constexpr auto DIR_PORT_1_GPIO_PIN = GPIO_PIN_1; ///< Not used
+} // namespace dmx::config
+#endif // DMX_BOARD_GD32F450VI_H_
