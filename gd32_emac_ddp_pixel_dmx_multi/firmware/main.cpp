@@ -26,6 +26,7 @@
 #pragma GCC optimize("O2")
 #pragma GCC optimize("no-tree-loop-distribute-patterns")
 
+#include "gd32/hal.h"
 #include "watchdog.h"
 #include "network.h"
 #include "apps/mdns.h"
