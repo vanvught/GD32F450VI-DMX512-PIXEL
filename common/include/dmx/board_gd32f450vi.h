@@ -2,7 +2,7 @@
  * @file board_gd32f450vi.h
  *
  */
-/* Copyright (C) 2022 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2022-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,13 +40,13 @@ inline constexpr uint32_t kPorts = DMX_MAX_PORTS;
 #define DMX_USE_USART2
 #define DMX_USE_USART5
 
-inline constexpr auto USART2_PORT = 0;
-inline constexpr auto USART5_PORT = 1;
+inline constexpr auto kUsart2Port = 0;
+inline constexpr auto kUsart5Port = 1;
 
-inline constexpr auto DIR_PORT_0_GPIO_PORT = GPIOD;
-inline constexpr auto DIR_PORT_0_GPIO_PIN = GPIO_PIN_0; ///< Not used
+inline constexpr auto kDirPort0GpioPort = GPIOD;
+inline constexpr auto kDirPort0GpioPin = GPIO_PIN_0; ///< Not used
 
-inline constexpr auto DIR_PORT_1_GPIO_PORT = GPIOD;
-inline constexpr auto DIR_PORT_1_GPIO_PIN = GPIO_PIN_1; ///< Not used
+inline constexpr auto kDirPort1GpioPort = GPIOD;
+inline constexpr auto kDirPort1GpioPin = GPIO_PIN_1; ///< Not used
 } // namespace dmx::config
 #endif // DMX_BOARD_GD32F450VI_H_
