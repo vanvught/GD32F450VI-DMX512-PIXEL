@@ -26,8 +26,6 @@
 #ifndef GD32_HAL_H_
 #define GD32_HAL_H_
 
-#include <cstdint>
-
 #include "gd32.h" // IWYU pragma: keep
 
 #if defined(ENABLE_USB_HOST)
@@ -52,6 +50,8 @@ void emac_debug_run();
 #include "hal_panelled.h"
 
 namespace hal {
+void Init();
+
 inline constexpr const char kWebsite[] = "https://gd32-dmx.org";
 inline constexpr float kCoreTemperatureMin = -40.0;
 inline constexpr float kCoreTemperatureMax = +85.0;

@@ -44,7 +44,6 @@
 #include "configstore.h"
 #include "firmwareversion.h"
 #include "software_version.h"
-
 #include "common/utils/utils_flags.h"
 #include "configurationstore.h"
 
@@ -117,11 +116,11 @@ int main() // NOLINT
 
     RemoteConfig remote_config(remoteconfig::Output::PIXEL, kActivePorts);
 
-    display.TextStatus("Starting DDP Display", console::Colours::kConsoleYellow);
+    display.TextStatus("Starting DDP Display", ansi::Colours::Colour::kYellow);
 
     ddpdisplay.Start();
 
-    display.TextStatus("DDP Display Started", console::Colours::kConsoleGreen);
+    display.TextStatus("DDP Display Started", ansi::Colours::Colour::kGreen);
 
     watchdog::Init();
 
