@@ -30,7 +30,7 @@
 #include <cstdint>
 #include <cstdio>
 
-#include "gd32/hal_watchdog.h"
+#include "watchdog.h"
 #include "network.h"
 #include "apps/mdns.h"
 #include "displayudf.h"
@@ -89,7 +89,7 @@ int main() // NOLINT
     ddpdisplay.Print();
 
 #if defined(NODE_RDMNET_LLRP_ONLY)
-    RDMNetDevice llrp_only_device;
+    RdmNetDevice llrp_only_device;
     llrp_only_device.Print();
 #endif
 
@@ -114,10 +114,10 @@ int main() // NOLINT
 
     display.TextStatus("DDP Display Started", console::Colours::kConsoleGreen);
 
-    hal::WatchdogInit();
+    watchdog::Init();
 
     for (;;) {
-        hal::WatchdogFeed();
+        watchdog::Feed();
         network::Run();
         pixeltest_pattern.Run();
         hal::Run();

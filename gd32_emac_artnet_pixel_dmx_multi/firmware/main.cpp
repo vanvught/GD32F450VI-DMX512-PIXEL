@@ -30,7 +30,7 @@
 #include <cstdint>
 
 #include "gd32/hal.h"
-#include "gd32/hal_watchdog.h"
+#include "watchdog.h"
 #include "network.h"
 #include "displayudf.h"
 #include "json/displayudfparams.h"
@@ -98,8 +98,8 @@ int main() // NOLINT
     for (uint32_t port_index = dmxnode::kDmxportOffset; port_index < dmxnode::kMaxPorts; port_index++) {
         const auto kDmxPortIndex = port_index - dmxnode::kDmxportOffset;
 
-        if (dmxnode_node.GetPortDirection(port_index) == dmxnode::PortDirection::kOutput) {
-            dmx.SetPortDirection(kDmxPortIndex, dmx::PortDirection::kOutput, false);
+        if (dmxnode_node.PortDirection(port_index) == dmxnode::Direction::kOutput) {
+            dmx.SetPortDirection(kDmxPortIndex, dmx::Direction::kOutput, false);
             dmx_universes++;
         }
     }
@@ -142,10 +142,10 @@ int main() // NOLINT
 
     display.TextStatus(DmxNodeMsgConst::STARTED, console::Colours::kConsoleGreen);
 
-    hal::WatchdogInit();
+    watchdog::Init();
 
     for (;;) {
-        hal::WatchdogFeed();
+        watchdog::Feed();
         network::Run();
         dmxnode_node.Run();
 #if defined(NODE_SHOWFILE)
