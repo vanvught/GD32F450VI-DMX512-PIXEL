@@ -41,7 +41,7 @@ DSTATUS disk_initialize(BYTE drv) {
     usb_core_driver* udev = (usb_core_driver*)usb_host.data;
 
     if (udev->host.connect_status) {
-        state &= ~STA_NOINIT;
+        state &= static_cast<DSTATUS>(~STA_NOINIT);
     }
 
     return state;

@@ -23,14 +23,14 @@
  * THE SOFTWARE.
  */
 
-#include <cassert>
 #include <cstdint>
+#include <cassert>
 
-#include "gd32.h"
 #include "firmware/debug/debug_debug.h"
+#include "gd32.h" // IWYU pragma: keep
 
 #if defined(GD32F30X)
-#include "usbd_conf.h"
+#include "usbd_conf.h" // IWYU pragma: keep
 #else
 #ifndef USE_USB_FS
 #error
@@ -40,12 +40,13 @@
 void usb_mdelay(uint32_t);
 #endif
 
-void UsbRcuConfig() {
+namespace usb {
+void RcuConfig() {
 #if !defined(GD32F4XX)
 #if defined(GD32F30X)
     DEBUG_ENTRY();
 
-    uint32_t kSystemClock = rcu_clock_freq_get(CK_SYS);
+    const auto kSystemClock = rcu_clock_freq_get(CK_SYS);
 
     // enable USB pull-up pin clock
     rcu_periph_clock_enable(RCU_AHBPeriph_GPIO_PULLUP);
@@ -109,7 +110,7 @@ void UsbRcuConfig() {
 #endif
 }
 
-void UsbGpioConfig() {
+void GpioConfig() {
 #if defined(GPIO_INIT)
 #if defined(GD32F30X)
     DEBUG_ENTRY();
@@ -134,7 +135,7 @@ void UsbGpioConfig() {
 #endif
 }
 
-void UsbVbusConfig() {
+void VbusConfig() {
 #if defined(USB_HOST_VBUS_GPIOx)
     rcu_periph_clock_enable(USB_HOST_VBUS_RCU_GPIOx);
 
@@ -151,7 +152,7 @@ void UsbVbusConfig() {
 #endif
 }
 
-void UsbIntrConfig() {
+void IntrConfig() {
 #if defined(GD32F30X)
     DEBUG_ENTRY();
 
@@ -172,3 +173,4 @@ void UsbIntrConfig() {
     DEBUG_ENTRY();
 #endif
 }
+} // namespace usb

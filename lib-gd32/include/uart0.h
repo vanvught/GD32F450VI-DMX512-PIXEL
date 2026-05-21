@@ -1,8 +1,8 @@
 /**
- * usb_vbus.cpp
+ * @file uart0.h
  *
  */
-/* Copyright (C) 2023-2026 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,20 +23,15 @@
  * THE SOFTWARE.
  */
 
-#include <cstdio>
-#include <cstdint>
+#ifndef UART0_H_
+#define UART0_H_
 
-#include "gd32.h" // IWYU pragma: keep
+namespace uart0 {
+void Init();
+void PutChar(int c);
+void Puts(const char* s);
+int Printf(const char* fmt, ...);
+int GetChar();
+} // namespace uart0
 
-extern "C" {
-void usb_vbus_drive(uint8_t state) { // NOLINT
-    printf("usb_vbus_drive: %u\n", state);
-#if defined(USB_HOST_VBUS_GPIOx)
-    if (0U == state) {
-        gpio_bit_reset(USB_HOST_VBUS_GPIOx, USB_HOST_VBUS_GPIO_PINx);
-    } else {
-        gpio_bit_set(USB_HOST_VBUS_GPIOx, USB_HOST_VBUS_GPIO_PINx);
-    }
-#endif
-}
-}
+#endif // UART0_H_

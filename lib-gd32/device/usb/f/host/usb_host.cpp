@@ -41,10 +41,11 @@ usbh_host usb_host;
 #endif
 extern usbh_user_cb usr_cb;
 
-void usb_init() {
-    UsbRcuConfig();
-    UsbGpioConfig();
-    UsbVbusConfig();
+namespace usb {
+void Init() {
+    RcuConfig();
+    GpioConfig();
+    VbusConfig();
 #if !defined(GD32F4XX)
     usbh_class_register(&usb_host, &usbh_msc);
     usbh_init(&usb_host, &usr_cb);
@@ -53,8 +54,9 @@ void usb_init() {
     usbh_init(&usb_host, &usbh_core, USB_CORE_ENUM_FS, &usr_cb);
 #endif
 
-    UsbIntrConfig();
+    IntrConfig();
 }
+} // namespace usb
 
 extern "C" void USBFS_IRQHandler() {
     usbh_isr(&usbh_core);

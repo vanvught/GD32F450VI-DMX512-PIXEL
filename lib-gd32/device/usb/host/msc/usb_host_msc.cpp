@@ -32,15 +32,9 @@
 
 #include "gd32.h" // IWYU pragma: keep
 
-extern "C"
-{
+extern "C" {
 #include "usb_host_msc.h"
 #include "usbh_core.h"
-}
-
-namespace console
-{
-void Error(const char*);
 }
 
 #include "../lib-hal/ff14b/source/ff.h"
@@ -51,8 +45,6 @@ static FATFS fat_fs;
 #else
 #error Not a recognized/tested FatFs version
 #endif
-
-#include "device/usb/host.h"
 
 usbh_user_cb usr_cb = {usbh_user_init,
                        usbh_user_deinit,
@@ -224,9 +216,7 @@ int usbh_usr_msc_application() {
             showfile::usb_ready();
 #endif
         } else {
-            char buffer[32];
-            snprintf(buffer, sizeof(buffer), "f_mount failed! %d\n", (int)result);
-            console::Error(buffer);
+            printf("f_mount failed! %d\n", (int)result);
             return -1;
         }
     }
