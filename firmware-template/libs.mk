@@ -69,6 +69,6 @@ ifeq ($(findstring OUTPUT_DDP_PIXEL,$(DEFINES)),OUTPUT_DDP_PIXEL)
 	LIBS+=pixel
 endif
 
-LIBS+=network configstore flash displayudf display hal
+LIBS+=network configstore flash displayudf display hal hwclock
 
 $(info $$LIBS [${LIBS}])
