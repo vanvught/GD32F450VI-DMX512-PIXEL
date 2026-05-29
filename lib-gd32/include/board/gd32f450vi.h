@@ -121,7 +121,7 @@
  // Panel LEDs
  #ifdef __cplusplus
  #include <cstdint>
- namespace hal::panelled {
+ namespace panelled {
  inline constexpr uint32_t kActivity = 0;
  inline constexpr uint32_t kArtnet = 0;
  inline constexpr uint32_t kDdp = 0;
@@ -136,7 +136,7 @@
  // DMX
  static constexpr uint32_t kPortARx = 0;
  static constexpr uint32_t kPortATx = 0;
- } // namespace hal::panelled
+ } // namespace panelled
  #endif
 
 /**
