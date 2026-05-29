@@ -37,8 +37,6 @@
 #include "dmxnodenode.h"
 #include "dmxnodemsgconst.h"
 #include "firmware/pixeldmx/show.h"
-#include "common/utils/utils_flags.h"
-#include "pixeltype.h"
 #include "pixeltestpattern.h"
 #include "json/pixeldmxparams.h"
 #include "pixeldmxmulti.h"
@@ -74,19 +72,17 @@ int main() // NOLINT
     DmxNodeNode dmxnode_node;
 
     // Pixel - 64 Universes
-    PixelDmxMulti pixeldmx_multi;
+    PixelDmxMulti pixeldmx_multi;    
+    PixelTestPattern pixeltest_pattern(pixelpatterns::Pattern::kNone, CONFIG_DMXNODE_PIXEL_MAX_PORTS);
 
     json::PixelDmxParams pixeldmx_params;
     pixeldmx_params.Load();
     pixeldmx_params.Set();
 
     const auto kPixelActivePorts = pixeldmx_multi.GetOutputPorts();
-    const auto kTestPattern = common::FromValue<pixelpatterns::Pattern>(ConfigStore::Instance().DmxLedGet(&common::store::DmxLed::test_pattern));
-
-    PixelTestPattern pixeltest_pattern(kTestPattern, kPixelActivePorts);
+    const auto kTestPattern = pixeltest_pattern.GetPattern();
 
     // DMX - 2 Universes
-
     Dmx dmx;
 
     json::DmxSendParams dmxparams;
@@ -108,10 +104,10 @@ int main() // NOLINT
 
     // DmxNodeWith4
 
-    DmxNodeWith4<CONFIG_DMXNODE_DMX_PORT_OFFSET> dmxNodeWith4((PixelTestPattern::Get()->GetPattern() != pixelpatterns::Pattern::kNone) ? nullptr : &pixeldmx_multi, (dmx_universes != 0) ? &dmx_send : nullptr);
-    dmxNodeWith4.Print();
+    DmxNodeWith4<CONFIG_DMXNODE_DMX_PORT_OFFSET> dmx_node_with4((kTestPattern != pixelpatterns::Pattern::kNone) ? nullptr : &pixeldmx_multi, (dmx_universes != 0) ? &dmx_send : nullptr);
+    dmx_node_with4.Print();
 
-    dmxnode_node.SetOutput(&dmxNodeWith4);
+    dmxnode_node.SetOutput(&dmx_node_with4);
 
 #if defined(NODE_SHOWFILE)
     ShowFile showfile;
@@ -130,7 +126,7 @@ int main() // NOLINT
     displayudf_params.Load();
     displayudf_params.SetAndShow();
 
-    common::firmware::pixeldmx::Show(7);
+    common::firmware::pixeldmx::Show(7, kTestPattern);
 
     RemoteConfig remote_config(remoteconfig::Output::PIXEL, dmxnode_node.GetActiveOutputPorts());
 

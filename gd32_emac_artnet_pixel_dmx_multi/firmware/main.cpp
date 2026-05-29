@@ -76,15 +76,14 @@ int main() // NOLINT
 
     // Pixel - 64 Universes
     PixelDmxMulti pixeldmx_multi;
+    PixelTestPattern pixeltest_pattern(pixelpatterns::Pattern::kNone, CONFIG_DMXNODE_PIXEL_MAX_PORTS);
 
     json::PixelDmxParams pixeldmx_params;
     pixeldmx_params.Load();
     pixeldmx_params.Set();
 
     const auto kPixelActivePorts = pixeldmx_multi.GetOutputPorts();
-    const auto kTestPattern = common::FromValue<pixelpatterns::Pattern>(ConfigStore::Instance().DmxLedGet(&common::store::DmxLed::test_pattern));
-
-    PixelTestPattern pixeltest_pattern(kTestPattern, kPixelActivePorts);
+    const auto kTestPattern = pixeltest_pattern.GetPattern();
 
     // DMX - 2 Universes
     Dmx dmx;
@@ -132,7 +131,7 @@ int main() // NOLINT
     displayudf_params.Load();
     displayudf_params.SetAndShow();
 
-    common::firmware::pixeldmx::Show(7);
+    common::firmware::pixeldmx::Show(7, kTestPattern);
 
     RemoteConfig remote_config(remoteconfig::Output::PIXEL, dmxnode_node.GetActiveOutputPorts());
 

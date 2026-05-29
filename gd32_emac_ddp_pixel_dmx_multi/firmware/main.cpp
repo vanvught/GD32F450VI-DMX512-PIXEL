@@ -34,7 +34,6 @@
 #include "json/displayudfparams.h"
 #include "ddpdisplay.h"
 #include "firmware/pixeldmx/show.h"
-#include "pixeltype.h"
 #include "pixeltestpattern.h"
 #include "json/pixeldmxparams.h"
 #include "pixeldmxmulti.h"
@@ -45,8 +44,6 @@
 #include "configstore.h"
 #include "firmwareversion.h"
 #include "software_version.h"
-#include "common/utils/utils_flags.h"
-#include "configurationstore.h"
 
 namespace hal {
 void RebootHandler() {
@@ -71,6 +68,7 @@ int main() // NOLINT
 
     // LightSet A - Pixel - 64 Universes
     PixelDmxMulti pixeldmx_multi;
+    PixelTestPattern pixeltest_pattern(pixelpatterns::Pattern::kNone, 16);
 
     json::PixelDmxParams pixeldmx_params;
     pixeldmx_params.Load();
@@ -80,12 +78,9 @@ int main() // NOLINT
 
     ddpdisplay.SetCount(pixeldmx_multi.GetGroups(), pixeldmx_multi.GetLedsPerPixel(), kActivePorts);
 
-    const auto kTestPattern = common::FromValue<pixelpatterns::Pattern>(ConfigStore::Instance().DmxLedGet(&common::store::DmxLed::test_pattern));
-
-    PixelTestPattern pixeltest_pattern(kTestPattern, kActivePorts);
+    const auto kTestPattern = pixeltest_pattern.GetPattern();
 
     // LightSet B - DMX - 2 Universes
-
     Dmx dmx;
 
     json::DmxSendParams dmxparams;
@@ -97,10 +92,10 @@ int main() // NOLINT
 
     // DmxNodeWith4
 
-    DmxNodeWith4<CONFIG_DMXNODE_DMX_PORT_OFFSET> dmxNode((PixelTestPattern::Get()->GetPattern() != pixelpatterns::Pattern::kNone) ? nullptr : &pixeldmx_multi, &dmx_send);
-    dmxNode.Print();
+    DmxNodeWith4<CONFIG_DMXNODE_DMX_PORT_OFFSET> dmx_node((kTestPattern != pixelpatterns::Pattern::kNone) ? nullptr : &pixeldmx_multi, &dmx_send);
+    dmx_node.Print();
 
-    ddpdisplay.SetOutput(&dmxNode);
+    ddpdisplay.SetOutput(&dmx_node);
     ddpdisplay.Print();
 
     display.SetTitle("DDP Pixel %ux%u", kActivePorts, pixeldmx_multi.GetCount());
@@ -113,7 +108,7 @@ int main() // NOLINT
     displayudf_params.Load();
     displayudf_params.SetAndShow();
 
-    common::firmware::pixeldmx::Show(7);
+    common::firmware::pixeldmx::Show(7, kTestPattern);
 
     RemoteConfig remote_config(remoteconfig::Output::PIXEL, kActivePorts);
 
