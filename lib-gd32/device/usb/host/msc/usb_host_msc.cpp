@@ -37,7 +37,7 @@ extern "C" {
 #include "usbh_core.h"
 }
 
-#include "../lib-hal/ff14b/source/ff.h"
+#include "ff14b/source/ff.h"
 #include "device/usb/host.h"
 
 #if (FF_DEFINED == 86631) // R0.14b

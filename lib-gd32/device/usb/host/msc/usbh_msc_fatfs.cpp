@@ -29,8 +29,8 @@
 extern "C" {
 #include "usbh_msc_core.h"
 }
-#include "ff.h"
-#include "diskio.h"
+#include "ff14b/source/ff.h"
+#include "ff14b/source/diskio.h"
 
 static volatile DSTATUS state = STA_NOINIT;
 
