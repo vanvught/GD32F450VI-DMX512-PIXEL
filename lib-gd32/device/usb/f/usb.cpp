@@ -163,14 +163,14 @@ void IntrConfig() {
     // enable the USB low priority interrupt
     nvic_irq_enable(static_cast<uint8_t>(USBD_HP_CAN0_TX_IRQn), 1U, 0U);
 
-    DEBUG_ENTRY();
+    DEBUG_EXIT();
 #else
     DEBUG_ENTRY();
 
     nvic_priority_group_set(NVIC_PRIGROUP_PRE2_SUB2);
     nvic_irq_enable(static_cast<uint8_t>(USBFS_IRQn), 2U, 0U);
 
-    DEBUG_ENTRY();
+    DEBUG_EXIT();
 #endif
 }
 } // namespace usb
