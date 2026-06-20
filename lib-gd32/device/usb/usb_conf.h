@@ -26,7 +26,7 @@
 #ifndef USB_USB_CONF_H_
 #define USB_USB_CONF_H_
 
-#include "gd32.h" // IWYU pragma: keep
+#include "gd32xxxx.h" // IWYU pragma: keep
 
 #if defined(GD32H7XX)
 #include "h/usb_conf.h" // IWYU pragma: keep

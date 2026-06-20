@@ -26,12 +26,7 @@
 #ifndef USB_USBH_CONF_H_
 #define USB_USBH_CONF_H_
 
-#include <stdint.h>
-
-#include "gd32.h" // IWYU pragma: keep
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+#include "gd32xxxx.h" // IWYU pragma: keep
 
 #define USBH_MAX_EP_NUM           2
 #define USBH_MAX_INTERFACES_NUM   2

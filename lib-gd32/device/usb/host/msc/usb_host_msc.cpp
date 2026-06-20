@@ -30,7 +30,8 @@
 #include <cstdio>
 #include <cstdint>
 
-#include "gd32.h" // IWYU pragma: keep
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 extern "C" {
 #include "usb_host_msc.h"
@@ -223,3 +224,5 @@ int usbh_usr_msc_application() {
 
     return 0;
 }
+
+#pragma GCC diagnostic pop

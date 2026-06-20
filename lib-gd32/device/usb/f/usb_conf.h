@@ -28,8 +28,6 @@
 
 #include <stdint.h>
 
-#include "gd32.h" // IWYU pragma: keep
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wattributes"
 
