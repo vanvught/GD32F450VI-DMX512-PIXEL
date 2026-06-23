@@ -26,7 +26,10 @@
 #ifndef USB_USBH_CONF_H_
 #define USB_USBH_CONF_H_
 
-#include "gd32xxxx.h" // IWYU pragma: keep
+#ifdef __cplusplus
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 
 #define USBH_MAX_EP_NUM           2
 #define USBH_MAX_INTERFACES_NUM   2

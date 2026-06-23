@@ -208,7 +208,7 @@ void usbh_user_over_current_detected() {
 
 int usbh_usr_msc_application() {
     if (usbh_usr_application_state == USBH_USR_FS_MOUNT) {
-        const auto result = f_mount(&fat_fs, (const TCHAR*)"0:/", (BYTE)0);
+        const auto result = f_mount(&fat_fs, reinterpret_cast<const TCHAR*>("0:/"), (BYTE)0);
 
         if (result == FR_OK) {
             s_status = usb::host::Status::READY;
@@ -217,7 +217,7 @@ int usbh_usr_msc_application() {
             showfile::usb_ready();
 #endif
         } else {
-            printf("f_mount failed! %d\n", (int)result);
+            printf("f_mount failed! %d\n", static_cast<int>(result));
             return -1;
         }
     }

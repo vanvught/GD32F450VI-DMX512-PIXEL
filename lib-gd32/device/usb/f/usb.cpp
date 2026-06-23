@@ -159,16 +159,16 @@ void IntrConfig() {
     // 2 bits for preemption priority, 2 bits for subpriority
     nvic_priority_group_set(NVIC_PRIGROUP_PRE2_SUB2);
     // enable the USB low priority interrupt
-    nvic_irq_enable(static_cast<uint8_t>(USBD_LP_CAN0_RX0_IRQn), 2U, 0U);
+    nvic_irq_enable(USBD_LP_CAN0_RX0_IRQn, 2U, 0U);
     // enable the USB low priority interrupt
-    nvic_irq_enable(static_cast<uint8_t>(USBD_HP_CAN0_TX_IRQn), 1U, 0U);
+    nvic_irq_enable(USBD_HP_CAN0_TX_IRQn, 1U, 0U);
 
     DEBUG_EXIT();
 #else
     DEBUG_ENTRY();
 
     nvic_priority_group_set(NVIC_PRIGROUP_PRE2_SUB2);
-    nvic_irq_enable(static_cast<uint8_t>(USBFS_IRQn), 2U, 0U);
+    nvic_irq_enable(USBFS_IRQn, 2U, 0U);
 
     DEBUG_EXIT();
 #endif

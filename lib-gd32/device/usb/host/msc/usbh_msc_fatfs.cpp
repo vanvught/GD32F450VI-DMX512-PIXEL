@@ -104,7 +104,7 @@ DRESULT disk_write(BYTE drv, const BYTE *buff, DWORD sector, UINT count) {
 		do {
 			status = usbh_msc_write(
 				&usb_host, drv, sector,
-				reinterpret_cast<uint8_t *>(const_cast<BYTE *>(buff)), count);
+				(const_cast<BYTE *>(buff)), count);
 
 			if (!udev->host.connect_status) {
 				return RES_ERROR;
