@@ -157,8 +157,8 @@ void usbh_user_device_speed_detected(uint32_t device_speed) {
 void usbh_user_device_desc_available(void* device_desc) {
     auto* pDevStr = reinterpret_cast<usb_desc_dev*>(device_desc);
 
-    printf("VID: %04Xh\n", static_cast<uint32_t>(pDevStr->idVendor));
-    printf("PID: %04Xh\n", static_cast<uint32_t>(pDevStr->idProduct));
+    printf("VID: %04Xh\n", static_cast<unsigned>(pDevStr->idVendor));
+    printf("PID: %04Xh\n", static_cast<unsigned>(pDevStr->idProduct));
 }
 
 void usbh_user_device_address_assigned() {

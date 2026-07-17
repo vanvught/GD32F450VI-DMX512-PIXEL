@@ -29,6 +29,7 @@
 #include <cstdint>
 
 #include "gd32.h" // IWYU pragma: keep
+#include "gd32/dmx_port.h"
 
 #define DMX_MAX_PORTS 2
 
@@ -40,13 +41,7 @@ inline constexpr uint32_t kPorts = DMX_MAX_PORTS;
 #define DMX_USE_USART2
 #define DMX_USE_USART5
 
-inline constexpr auto kUsart2Port = 0;
-inline constexpr auto kUsart5Port = 1;
-
-inline constexpr auto kDirPort0GpioPort = GPIOD;
-inline constexpr auto kDirPort0GpioPin = GPIO_PIN_0; ///< Not used
-
-inline constexpr auto kDirPort1GpioPort = GPIOD;
-inline constexpr auto kDirPort1GpioPin = GPIO_PIN_1; ///< Not used
+inline constexpr port::Info kPort0 = {.uart = gd32::Uart::kUart2, .port = 0, .pin = 0, .usage = port::Usage::kTxOnly};
+inline constexpr port::Info kPort1 = {.uart = gd32::Uart::kUart5, .port = 0, .pin = 0, .usage = port::Usage::kTxOnly};
 } // namespace dmx::config
 #endif // DMX_BOARD_GD32F450VI_H_
