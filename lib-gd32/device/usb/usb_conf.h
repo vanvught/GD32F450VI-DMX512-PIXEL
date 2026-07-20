@@ -26,6 +26,7 @@
 #ifndef USB_USB_CONF_H_
 #define USB_USB_CONF_H_
 
+#include <string.h>   // IWYU pragma: keep // BUG: not included in usbh_msc_scsi.c
 #include "gd32xxxx.h" // IWYU pragma: keep
 
 #if defined(GD32H7XX)
