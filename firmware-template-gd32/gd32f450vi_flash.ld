@@ -110,6 +110,18 @@ SECTIONS
     . = ALIGN(4);
     _elightset = .;
   } >RAM
+  
+  .http (NOLOAD) :
+  {
+    . = ALIGN(4);
+    _shttp = .;
+    KEEP(*(.http))
+    KEEP(*(.http.*))
+    KEEP(*(.httpd))
+    KEEP(*(.httpd.*))
+    . = ALIGN(4);
+    _ehttp = .;
+  } > RAM
 
   .sram1 :
   {
@@ -128,12 +140,17 @@ SECTIONS
   	. = ALIGN(4);
     *(.sram2)
     *(.sram2*)
-	. = ALIGN(4);
-	_spixel = .;
-    *(.pixel)
-	. = ALIGN(4);
-	_epixel = .;
   } >RAM2 
+  
+  .pixel (NOLOAD) :
+  {
+    . = ALIGN(4);
+    _spixel = .;
+    KEEP(*(.pixel))
+    KEEP(*(.pixel.*))
+    . = ALIGN(4);
+    _epixel = .;
+  } > RAM2
 
   _sidata = LOADADDR(.data);
   .data :
