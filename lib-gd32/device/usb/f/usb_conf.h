@@ -33,7 +33,7 @@
 
 #if !defined(USE_USB_FS)
 #define USE_USB_FS
-#endif
+#endif // USE_USB_FS
 #define USB_FS_CORE
 
 /*******************************************************************************
@@ -65,35 +65,35 @@
 #if defined(USB_FS_CORE)
 #define USBFS_SOF_OUTPUT        0
 #define USBFS_LOW_POWER         0
-#endif
+#endif // USB_FS_CORE
 
 #define USE_HOST_MODE
 
 #ifndef USB_FS_CORE
 #ifndef USB_HS_CORE
 #error "USB_HS_CORE or USB_FS_CORE should be defined"
-#endif
-#endif
+#endif // USB_HS_CORE
+#endif // USB_FS_CORE
 
 #ifndef USE_DEVICE_MODE
 #ifndef USE_HOST_MODE
 #error "USE_DEVICE_MODE or USE_HOST_MODE should be defined"
-#endif
-#endif
+#endif // USE_HOST_MODE
+#endif // USE_DEVICE_MODE
 
 #ifndef USE_USB_HS
 #ifndef USE_USB_FS
 #error "USE_USB_HS or USE_USB_FS should be defined"
-#endif
-#endif
+#endif // USE_USB_FS
+#endif // USE_USB_HS
 
 /* __packed keyword used to decrease the data type alignment to 1-byte */
 #if defined(__GNUC__) /* GNU Compiler */
 #ifndef __packed
 #define __packed __attribute__((__packed__))
-#endif
+#endif // __packed
 #elif defined(__TASKING__) /* TASKING Compiler */
 #define __packed __unaligned
-#endif /* __GNUC__ */
+#endif // __GNUC__
 
-#endif /* F_USB_CONF_H_ */
+#endif // F_USB_CONF_H_

@@ -38,7 +38,7 @@ usbh_host usb_host;
 #else
 usb_core_driver usbh_core;
 usbh_host usb_host;
-#endif
+#endif // GD32F4XX
 extern usbh_user_cb usr_cb;
 
 namespace usb {
@@ -52,7 +52,7 @@ void Init() {
 #else
     usbh_class_register(&usb_host, &usbh_msc);
     usbh_init(&usb_host, &usbh_core, USB_CORE_ENUM_FS, &usr_cb);
-#endif
+#endif // GD32F4XX
 
     IntrConfig();
 }

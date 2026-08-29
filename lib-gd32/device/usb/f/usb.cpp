@@ -26,25 +26,25 @@
 #include <cstdint>
 #include <cassert>
 
-#include "firmware/debug/debug_debug.h"
 #include "gd32.h" // IWYU pragma: keep
+#include "gd32_debug.h"
 
 #if defined(GD32F30X)
 #include "usbd_conf.h" // IWYU pragma: keep
 #else
 #ifndef USE_USB_FS
 #error
-#endif
-#endif
+#endif // USE_USB_FS
+#endif // GD32F30X
 #if defined(USB_HOST_VBUS_GPIOx)
 void usb_mdelay(uint32_t);
-#endif
+#endif // USB_HOST_VBUS_GPIOx
 
 namespace usb {
 void RcuConfig() {
 #if !defined(GD32F4XX)
 #if defined(GD32F30X)
-    DEBUG_ENTRY();
+    GD32_USB_DEBUG_ENTRY();
 
     const auto kSystemClock = rcu_clock_freq_get(CK_SYS);
 
@@ -66,9 +66,9 @@ void RcuConfig() {
     // enable USB APB1 clock
     rcu_periph_clock_enable(RCU_USBD);
 
-    DEBUG_EXIT();
+    GD32_USB_DEBUG_EXIT();
 #else
-    DEBUG_ENTRY();
+    GD32_USB_DEBUG_ENTRY();
 
     const auto kSystemClock = rcu_clock_freq_get(CK_SYS);
     uint32_t usbfs_prescaler = 0U;
@@ -88,10 +88,10 @@ void RcuConfig() {
     rcu_usbfs_trng_clock_config(usbfs_prescaler);
     rcu_periph_clock_enable(RCU_USBFS);
 
-    DEBUG_EXIT();
-#endif
+    GD32_USB_DEBUG_EXIT();
+#endif // GD32F30X
 #else
-    DEBUG_ENTRY();
+    GD32_USB_DEBUG_ENTRY();
 
     // configure the PLLSAIP = 48MHz, PLLSAI_N = 288, PLLSAI_P = 6, PLLSAI_R = 2
     rcu_pllsai_config(288U, 6U, 2U);
@@ -106,24 +106,24 @@ void RcuConfig() {
 
     rcu_periph_clock_enable(RCU_USBFS);
 
-    DEBUG_EXIT();
-#endif
+    GD32_USB_DEBUG_EXIT();
+#endif // GD32F4XX
 }
 
 void GpioConfig() {
 #if defined(GPIO_INIT)
 #if defined(GD32F30X)
-    DEBUG_ENTRY();
+    GD32_USB_DEBUG_ENTRY();
     // configure usb pull-up pin
     rcu_periph_clock_enable(RCU_AHBPeriph_GPIO_PULLUP);
     gpio_init(USB_PULLUP, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, USB_PULLUP_PIN);
     // Start DISCONNECTED – let usbd_connect() decide when to attach
     gpio_bit_reset(USB_PULLUP, USB_PULLUP_PIN);
-    DEBUG_EXIT();
+    GD32_USB_DEBUG_EXIT();
 #else
-#endif
+#endif // GD32F30X
 #else
-    DEBUG_ENTRY();
+    GD32_USB_DEBUG_ENTRY();
     rcu_periph_clock_enable(RCU_SYSCFG);
     rcu_periph_clock_enable(RCU_GPIOA);
 
@@ -131,8 +131,8 @@ void GpioConfig() {
     gpio_output_options_set(GPIOA, GPIO_OTYPE_PP, GPIO_OSPEED_MAX, GPIO_PIN_11 | GPIO_PIN_12);
 
     gpio_af_set(GPIOA, GPIO_AF_10, GPIO_PIN_11 | GPIO_PIN_12);
-    DEBUG_EXIT();
-#endif
+    GD32_USB_DEBUG_EXIT();
+#endif // GPIO_INIT
 }
 
 void VbusConfig() {
@@ -144,17 +144,17 @@ void VbusConfig() {
 #else
     gpio_mode_set(USB_HOST_VBUS_GPIOx, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, USB_HOST_VBUS_GPIO_PINx);
     gpio_output_options_set(USB_HOST_VBUS_GPIOx, GPIO_OTYPE_PP, GPIO_OSPEED_MAX, USB_HOST_VBUS_GPIO_PINx);
-#endif
+#endif // GPIO_INIT
 
     gpio_bit_set(USB_HOST_VBUS_GPIOx, USB_HOST_VBUS_GPIO_PINx);
 
     usb_mdelay(200);
-#endif
+#endif // USB_HOST_VBUS_GPIOx
 }
 
 void IntrConfig() {
 #if defined(GD32F30X)
-    DEBUG_ENTRY();
+    GD32_USB_DEBUG_ENTRY();
 
     // 2 bits for preemption priority, 2 bits for subpriority
     nvic_priority_group_set(NVIC_PRIGROUP_PRE2_SUB2);
@@ -163,14 +163,14 @@ void IntrConfig() {
     // enable the USB low priority interrupt
     nvic_irq_enable(USBD_HP_CAN0_TX_IRQn, 1U, 0U);
 
-    DEBUG_EXIT();
+    GD32_USB_DEBUG_EXIT();
 #else
-    DEBUG_ENTRY();
+    GD32_USB_DEBUG_ENTRY();
 
     nvic_priority_group_set(NVIC_PRIGROUP_PRE2_SUB2);
     nvic_irq_enable(USBFS_IRQn, 2U, 0U);
 
-    DEBUG_EXIT();
-#endif
+    GD32_USB_DEBUG_EXIT();
+#endif // GD32F30X
 }
 } // namespace usb

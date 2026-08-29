@@ -25,7 +25,7 @@
 
 #if defined(DEBUG_USB_HOST_MSC)
 #undef NDEBUG
-#endif
+#endif // DEBUG_USB_HOST_MSC
 
 #include <cstdio>
 #include <cstdint>
@@ -40,12 +40,13 @@ extern "C" {
 
 #include "ff14b/source/ff.h"
 #include "device/usb/host.h"
+#include "ansi_colour.h"
 
 #if (FF_DEFINED == 86631) // R0.14b
 static FATFS fat_fs;
 #else
 #error Not a recognized/tested FatFs version
-#endif
+#endif // (FF_DEFINED == 86631)
 
 usbh_user_cb usr_cb = {usbh_user_init,
                        usbh_user_deinit,
@@ -71,9 +72,9 @@ namespace showfile {
 void usb_ready();
 void usb_disconnected();
 } // namespace showfile
-#endif
+#endif // defined NODE_SHOWFILE
 
-/* state machine for the USBH_USR_ApplicationState */
+// state machine for the USBH_USR_ApplicationState
 #define USBH_USR_FS_MOUNT 0
 #define USBH_USR_FS_READY 1
 
@@ -102,7 +103,7 @@ void usbh_user_init() {
         s_status = usb::host::Status::DISCONNECTED;
 #ifndef NDEBUG
         puts("USB host library started.");
-#endif
+#endif // NDEBUG
     }
 }
 
@@ -126,7 +127,7 @@ void usbh_user_device_disconnected() {
     usbh_usr_application_state = USBH_USR_FS_MOUNT;
 #if defined NODE_SHOWFILE
     showfile::usb_disconnected();
-#endif
+#endif // defined NODE_SHOWFILE
 }
 
 void usbh_user_device_reset() {
@@ -142,12 +143,12 @@ void usbh_user_device_speed_detected(uint32_t device_speed) {
         s_speed = usb::host::Speed::FULL;
 #ifndef NDEBUG
         puts("> Full speed device detected.");
-#endif
+#endif // NDEBUG
     } else if (PORT_SPEED_LOW == device_speed) {
         s_speed = usb::host::Speed::LOW;
 #ifndef NDEBUG
         puts("> Low speed device detected.");
-#endif
+#endif // NDEBUG
     } else {
         s_speed = usb::host::Speed::FAULT;
         puts("> Device Fault.");
@@ -208,16 +209,16 @@ void usbh_user_over_current_detected() {
 
 int usbh_usr_msc_application() {
     if (usbh_usr_application_state == USBH_USR_FS_MOUNT) {
-        const auto result = f_mount(&fat_fs, reinterpret_cast<const TCHAR*>("0:/"), (BYTE)0);
+        const auto result = f_mount(&fat_fs, reinterpret_cast<const TCHAR*>(""), (BYTE)0);
 
         if (result == FR_OK) {
             s_status = usb::host::Status::READY;
             usbh_usr_application_state = USBH_USR_FS_READY;
 #if defined NODE_SHOWFILE
             showfile::usb_ready();
-#endif
+#endif // defined NODE_SHOWFILE
         } else {
-            printf("f_mount failed! %d\n", static_cast<int>(result));
+            printf("%sf_mount failed! %d%s\n", ansi::Colours::Fg::kRed, static_cast<int>(result), ansi::Colours::Fg::kDefault);
             return -1;
         }
     }

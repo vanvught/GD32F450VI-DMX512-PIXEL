@@ -34,15 +34,15 @@ extern "C" {
 extern "C" {
 #include "cdc_acm_core.h"
 }
-#endif
+#endif // CONFIG_USB_DEVICE_CDC
 
 #if defined(CONFIG_USB_DEVICE_CDC)
 usb_core_driver cdc_acm;
-#endif
+#endif // CONFIG_USB_DEVICE_CDC
 
 #ifndef USE_USB_FS
 #error
-#endif
+#endif // USE_USB_FS
 
 #if defined(CONFIG_USB_DEVICE_CDC)
 void UsbInit() {
@@ -51,7 +51,7 @@ void UsbInit() {
 
 #if defined(CONFIG_USB_DEVICE_CDC)
     usbd_init(&cdc_acm, USB_CORE_ENUM_FS, &cdc_desc, &cdc_class);
-#endif
+#endif // CONFIG_USB_DEVICE_CDC
 
     UsbIntrConfig();
 }
@@ -61,4 +61,4 @@ extern usb_core_driver cdc_acm;
 extern "C" void USBFS_IRQHandler() {
     usbd_isr(&cdc_acm);
 }
-#endif
+#endif // CONFIG_USB_DEVICE_CDC

@@ -23,8 +23,6 @@
  * THE SOFTWARE.
  */
 
-#include <time.h>
-
 extern "C" {
 #include "usbh_msc_core.h"
 }
@@ -119,7 +117,7 @@ DRESULT disk_write(BYTE drv, const BYTE *buff, DWORD sector, UINT count) {
 	return RES_ERROR;
 }
 
-#endif /* CONFIG_FS_ENABLE_WRITE */
+#endif // CONFIG_FS_ENABLE_WRITE
 
 DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void *buff) {
 	DRESULT res = RES_OK;
@@ -170,18 +168,5 @@ DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void *buff) {
 	}
 
 	return res;
-}
-
-DWORD get_fattime(void) {
-	auto ltime = time(nullptr);
-	auto *local_time = localtime(&ltime);
-	auto packed_time = ((DWORD)(local_time->tm_year + 20) << 25) |
-					   ((DWORD)(local_time->tm_mon + 1) << 21) |
-					   ((DWORD)local_time->tm_mday << 16) |
-					   ((DWORD)local_time->tm_hour << 11) |
-					   ((DWORD)local_time->tm_min << 5) |
-					   ((DWORD)local_time->tm_sec >> 1);
-
-	return packed_time;
 }
 }

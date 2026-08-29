@@ -28,7 +28,7 @@
 
 #if !defined(GD32F450)
 # error This file should not be included
-#endif
+#endif // GD32F450
 
 #include <stdint.h>
 
@@ -51,4 +51,4 @@
 
 #include "gd32f4xx_mcu.h"
 
-#endif /* MCU_GD32F450_MCU_H_ */
+#endif // MCU_GD32F450_MCU_H_

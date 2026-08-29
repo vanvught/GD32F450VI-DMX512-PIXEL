@@ -26,15 +26,16 @@
 #include <cassert>
 #include <cstdint>
 
-#include "timing.h"
+#include "gd32_timers.h"
+#include "common/utils/utils_units.h"
 
 extern "C" {
 void usb_udelay(uint32_t micros) { // NOLINT
-    timing::DelayUs(micros);
+    gd32::DelayUs(micros);
 }
 
 void usb_mdelay(uint32_t millis) { // NOLINT
-    assert(millis <= (UINT32_MAX / 10000U));
-    timing::DelayUs(millis * 1000U);
+    assert(millis <= (UINT32_MAX / common::units::kUsPerMs));
+    gd32::DelayUs(millis * common::units::kUsPerMs);
 }
 }

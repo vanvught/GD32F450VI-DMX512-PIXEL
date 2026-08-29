@@ -28,11 +28,11 @@
 
 #if !defined(BOARD_GD32F450VI)
 # error This file should not be included
-#endif
+#endif // BOARD_GD32F450VI
 
 #if defined (MCU_GD32F450_MCU_H_)
 # error This file should be included later
-#endif
+#endif // defined (MCU_GD32F450_MCU_H_)
 
 #include <stdint.h>
 
@@ -137,7 +137,7 @@
  static constexpr uint32_t kPortARx = 0;
  static constexpr uint32_t kPortATx = 0;
  } // namespace panelled
- #endif
+ #endif // __cplusplus
 
 /**
  * SPI flash
@@ -171,7 +171,7 @@
 #define GD32_MCU_NAME   "GD32F450VI"
 #if !defined(GD32_BOARD_NAME)
 #define GD32_BOARD_NAME "GD32F450VI"
-#endif
+#endif // GD32_BOARD_NAME
 
 #include "mcu/gd32f450_mcu.h"
 #include "gd32_gpio.h"
@@ -216,8 +216,8 @@
 #define SPI_LCD_BL_GPIO		GD32_PORT_TO_GPIO(GD32_GPIO_PORTA, 12)
 #if defined(SPI_LCD_HAVE_CS_GPIO)
 # define SPI_LCD_CS_GPIO	GD32_PORT_TO_GPIO(GD32_GPIO_PORTA, 13)
-#endif
+#endif // SPI_LCD_HAVE_CS_GPIO
 
 #include "gpio_header.h"
 
-#endif /* BOARD_GD32F450VI_H_ */
+#endif // BOARD_GD32F450VI_H_

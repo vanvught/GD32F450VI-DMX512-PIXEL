@@ -33,6 +33,6 @@
 #include "h/usb_conf.h" // IWYU pragma: keep
 #else
 #include "f/usb_conf.h" // IWYU pragma: keep
-#endif
+#endif // GD32H7XX
 
 #endif // USB_USB_CONF_H_

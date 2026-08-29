@@ -29,7 +29,7 @@
 #ifdef __cplusplus
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
+#endif // __cplusplus
 
 #define USBH_MAX_EP_NUM           2
 #define USBH_MAX_INTERFACES_NUM   2
