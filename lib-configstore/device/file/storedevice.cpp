@@ -49,7 +49,9 @@ static uint32_t s_index = 0;
 StoreDevice::StoreDevice() {
     CONFIGSTORE_DEBUG_ENTRY();
 
-    if ((s_file = fopen(kFlashFileName, "r+")) == nullptr) {
+    s_file = fopen(kFlashFileName, "r+");
+
+    if (s_file == nullptr) {
         perror("fopen r+");
 
         s_file = fopen(kFlashFileName, "w+");
@@ -91,10 +93,11 @@ uint32_t StoreDevice::GetSectorSize() const {
     return kFlashSectorSize;
 }
 
-bool StoreDevice::Read(uint32_t offset, uint32_t length, uint8_t* buffer, storedevice::Result& result) {
+bool StoreDevice::Read(uint32_t offset, std::span<uint8_t> buffer, storedevice::Result& result) {
     assert(s_file != nullptr);
     CONFIGSTORE_DEBUG_ENTRY();
-    DEBUG_PRINTF("offset=%u, length=%u", offset, length);
+
+    DEBUG_PRINTF("offset=%u, length=%u", offset, static_cast<unsigned>(buffer.size()));
 
     if (fseek(s_file, static_cast<long int>(offset), SEEK_SET) != 0) {
         result = storedevice::Result::kError;
@@ -103,7 +106,7 @@ bool StoreDevice::Read(uint32_t offset, uint32_t length, uint8_t* buffer, stored
         return true;
     }
 
-    if (fread(buffer, 1, length, s_file) != length) {
+    if (fread(buffer.data(), 1, buffer.size(), s_file) != buffer.size()) {
         result = storedevice::Result::kError;
         perror("fread");
         CONFIGSTORE_DEBUG_EXIT();
@@ -173,9 +176,13 @@ bool StoreDevice::Erase(uint32_t offset, uint32_t length, storedevice::Result& r
     return true;
 }
 
-bool StoreDevice::Write(uint32_t offset, uint32_t length, const uint8_t* buffer, storedevice::Result& result) {
+bool StoreDevice::Write(uint32_t offset, std::span<const uint8_t> buffer, storedevice::Result& result) {
     CONFIGSTORE_DEBUG_ENTRY();
-    DEBUG_PRINTF("s_State=%u, offset=%u, length=%u [%u]", static_cast<unsigned int>(s_state), offset, length, s_index);
+
+    const auto kLength = static_cast<uint32_t>(buffer.size());
+
+    DEBUG_PRINTF("s_State=%u, offset=%u, length=%u [%u]", static_cast<unsigned>(s_state), offset, kLength, s_index);
+
     assert(s_state != State::kError);
     assert(s_file != nullptr);
 
@@ -193,14 +200,16 @@ bool StoreDevice::Write(uint32_t offset, uint32_t length, const uint8_t* buffer,
         result = storedevice::Result::kOk;
         CONFIGSTORE_DEBUG_EXIT();
         return false;
-    } else if (s_state == State::kRunning) {
-        uint32_t block_write_length = length - s_index;
+    }
+
+    if (s_state == State::kRunning) {
+        uint32_t block_write_length = kLength - s_index;
 
         if (block_write_length > kBlockWriteLength) {
             block_write_length = kBlockWriteLength;
         }
 
-        if (fwrite(&buffer[s_index], 1, block_write_length, s_file) != block_write_length) {
+        if (fwrite(buffer.data() + s_index, 1, block_write_length, s_file) != block_write_length) {
             s_state = State::kError;
             result = storedevice::Result::kError;
             perror("fwrite");
@@ -210,12 +219,14 @@ bool StoreDevice::Write(uint32_t offset, uint32_t length, const uint8_t* buffer,
 
         s_index += block_write_length;
 
-        if (s_index == length) {
+        if (s_index == kLength) {
             s_state = State::kIdle;
 
             if (fflush(s_file) != 0) {
                 perror("fflush");
             }
+
+            result = storedevice::Result::kOk;
 
             CONFIGSTORE_DEBUG_EXIT();
             return true;
