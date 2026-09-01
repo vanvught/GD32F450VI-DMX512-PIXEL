@@ -40,7 +40,7 @@ extern "C" {
 
 #include "ff14b/source/ff.h"
 #include "device/usb/host.h"
-#include "ansi_colour.h"
+#include "firmware/ansi_colour.h"
 
 #if (FF_DEFINED == 86631) // R0.14b
 static FATFS fat_fs;
