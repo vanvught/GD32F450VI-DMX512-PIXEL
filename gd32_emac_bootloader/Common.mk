@@ -12,4 +12,4 @@ DEFINES+=ENET_RXBUF_NUM=2 ENET_TXBUF_NUM=2
 
 SRCDIR=firmware lib
 
-LIBS=remoteconfig flashcodeinstall configstore display flashcode flash
+LIBS=flashcodeinstall flashcode 
