@@ -1,0 +1,17 @@
+BOARD=BOARD_GD32F450VI
+
+DEFINES =CONFIG_STORE_USE_SPI
+DEFINES+=CONFIG_USE_SOFTUART0
+
+DEFINES+=CONFIG_DEBUG_STACK
+
+DEFINES+=NDEBUG
+
+SRCDIR=
+LIBS=
+
+include Common.mk
+include ../firmware-template-gd32/Rules.mk
+
+
+prerequisites:
