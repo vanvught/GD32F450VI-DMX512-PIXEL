@@ -26,13 +26,13 @@
 #ifndef BOARD_GD32F450VI_H_
 #define BOARD_GD32F450VI_H_
 
-#if !defined(BOARD_GD32F450VI)
+#ifndef BOARD_GD32F450VI
 # error This file should not be included
 #endif // BOARD_GD32F450VI
 
-#if defined (MCU_GD32F450_MCU_H_)
+#ifdef MCU_GD32F450_MCU_H_
 # error This file should be included later
-#endif // defined (MCU_GD32F450_MCU_H_)
+#endif // MCU_GD32F450_MCU_H_
 
 #include <stdint.h>
 
@@ -169,7 +169,7 @@
  */
 
 #define GD32_MCU_NAME   "GD32F450VI"
-#if !defined(GD32_BOARD_NAME)
+#ifndef GD32_BOARD_NAME
 #define GD32_BOARD_NAME "GD32F450VI"
 #endif // GD32_BOARD_NAME
 
@@ -214,7 +214,7 @@
 #define SPI_LCD_RST_PIN		GD32_PORT_TO_GPIO(GD32_GPIO_PORTA, 14)
 #define SPI_LCD_DC_GPIO		GD32_PORT_TO_GPIO(GD32_GPIO_PORTA, 11)
 #define SPI_LCD_BL_GPIO		GD32_PORT_TO_GPIO(GD32_GPIO_PORTA, 12)
-#if defined(SPI_LCD_HAVE_CS_GPIO)
+#ifdef SPI_LCD_HAVE_CS_GPIO
 # define SPI_LCD_CS_GPIO	GD32_PORT_TO_GPIO(GD32_GPIO_PORTA, 13)
 #endif // SPI_LCD_HAVE_CS_GPIO
 
