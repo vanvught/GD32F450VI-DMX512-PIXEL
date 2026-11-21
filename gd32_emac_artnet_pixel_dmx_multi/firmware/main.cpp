@@ -38,7 +38,7 @@
 #include "dmxnodemsgconst.h"
 #ifdef ARTNET_HAVE_TRIGGER
 #include "artnettriggerhandler.h"
-#endif
+#endif // ARTNET_HAVE_TRIGGER
 #include "common/utils/utils_flags.h"
 #include "firmware/pixeldmx/show.h"
 #include "pixeltype.h"
@@ -48,9 +48,9 @@
 #include "json/dmxsendparams.h"
 #include "dmxsend.h"
 #include "dmxnodewith4.h"
-#if defined(NODE_SHOWFILE)
+#ifdef NODE_SHOWFILE
 #include "showfile.h"
-#endif
+#endif // NODE_SHOWFILE
 #include "remoteconfig.h"
 #include "configstore.h"
 #include "firmware/firmwareversion.h"
@@ -114,14 +114,14 @@ int main() // NOLINT
 
 #ifdef ARTNET_HAVE_TRIGGER
     ArtNetTriggerHandler triggerHandler(&dmxNode, &pixeldmx_multi);
-#endif
+#endif // ARTNET_HAVE_TRIGGER
 
     dmxnode_node.SetOutput(&dmxNode);
 
 #ifdef NODE_SHOWFILE
     ShowFile showfile;
     showfile.Print();
-#endif
+#endif // NODE_SHOWFILE
 
     dmxnode_node.Print();
 
@@ -139,11 +139,11 @@ int main() // NOLINT
 
     RemoteConfig remote_config(remoteconfig::Output::PIXEL, dmxnode_node.GetActiveOutputPorts());
 
-    display.TextStatus(DmxNodeMsgConst::START, ansi::Colours::Colour::kYellow);
+    display.TextStatus(DmxNodeMsgConst::kStart, ansi::Colours::Colour::kYellow);
 
     dmxnode_node.Start();
 
-    display.TextStatus(DmxNodeMsgConst::STARTED, ansi::Colours::Colour::kGreen);
+    display.TextStatus(DmxNodeMsgConst::kStarted, ansi::Colours::Colour::kGreen);
 
     watchdog::Init();
 
@@ -153,7 +153,7 @@ int main() // NOLINT
         dmxnode_node.Run();
 #ifdef NODE_SHOWFILE
         showfile.Run();
-#endif
+#endif // NODE_SHOWFILE
         pixeltest_pattern.Run();
         board::Run();
     }
